@@ -1,0 +1,5 @@
+{
+    "moodle-format_socialwall-postform": {
+        "requires": ["base", "node", "io-form", "moodle-core-notification-confirm"]
+    }
+}

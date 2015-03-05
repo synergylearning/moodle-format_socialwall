@@ -1,0 +1,201 @@
+.course-content ul.socialwall {margin:0;}
+.course-content ul.socialwall li.section {list-style: none;margin:0 0 5px 0;padding:0;}
+.course-content ul.socialwall li.section .content {margin:0 40px;}
+.course-content ul.socialwall li.section .left {float:left;}
+.course-content ul.socialwall li.section .right {float:right;}
+.course-content ul.socialwall li.section .left,
+.course-content ul.socialwall li.section .right {width:40px;text-align:center;padding: 6px 0;}
+.course-content ul.socialwall li.section .right img.icon { padding: 0 0 4px 0;}
+.course-content ul.socialwall li.section .left .section-handle img.icon { padding:0; vertical-align: baseline; }
+
+
+.format-socialwall #postform .fitem div.fitemtitle {
+    float: none;
+    padding-top: 5px;
+    text-align: left;
+    width: auto;
+}
+
+.format-socialwall #postform .fitem .felement {
+    margin-left: 0;
+}
+
+.format-socialwall #postform .fitem_fgroup .fitemtitle {
+    height: 0;
+}
+
+.format-socialwall #postform .fitem_fgroup .felement span,
+.format-socialwall #postform .fitem_fgroup .felement a {
+    margin-right: 5px;
+}
+
+.format-socialwall #postform .sw-texarea, #posttext {
+    width:100%;
+}
+
+.format-socialwall #postform #fitem_posttext {
+    margin-bottom: 0px;
+    margin-right: 90px;
+}
+
+.format-socialwall #postform #fgroup_id_group_1 {
+    float:left;
+}
+
+.format-socialwall #postform #fitem_id_submitbutton {
+    padding:0;margin:0;border:0;float:right;margin-top:30px;
+}
+
+.format-socialwall #postform #sw-addactivitylink {
+    float:right;
+    margin-right:90px;
+    border: none;
+    background: none;
+    box-shadow: none;
+    color:#ff6500;
+    text-decoration: underline;
+}
+
+.format-socialwall .tl-posts, .tl-comments {
+    list-style:none;
+    margin: 10px 0px;
+}
+
+.format-socialwall .tl-posts .section li.activity {
+    clear: none;
+    padding: 0;
+}
+
+.format-socialwall .tl-post, .tl-comment {
+    margin-bottom : 10px;
+    line-height: 18px;
+}
+
+.format-socialwall .tl-post {
+    margin: 30px 0;
+}
+
+.format-socialwall .tl-leftcol, .tl-author   {
+    float:left;
+    width:40px;
+}
+
+.format-socialwall .tl-author {
+    margin-bottom: 10px;
+}
+
+.format-socialwall .tl-text {
+    margin-left: 40px;
+    padding: 0 5px;
+    border-left: 2px solid #efefef;
+}
+
+.format-socialwall .tl-comments .tl-text {
+    border: none;
+}
+
+.format-socialwall .tl-authorname {
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.format-socialwall .tl-locked, .tl-postcomment, .tl-sticky {
+    float:right;
+    margin-left: 5px;
+}
+
+.format-socialwall .tl-timeago, .tl-counts {
+    font-size: 8px;
+    color: #666666;
+    line-height: 10px;
+}
+
+.format-socialwall .tl-counts span {
+    margin-right: 6px;
+}
+
+.format-socialwall .tl-commenttext-wrapper {
+    margin-right: 80px;
+}
+
+.format-socialwall .tl-commenttext {
+    width:100%;
+    margin: 0;
+}
+
+.format-socialwall .tl-showall {
+    text-align: center;
+    border-top: 1px solid #efefef;
+    border-bottom: 1px solid #efefef;
+}
+
+.format-socialwall .tl-action-icons {
+    margin-left: 8px;
+}
+
+.format-socialwall .postform .section-modchooser {
+    text-align:left;
+}
+
+.format-socialwall .postform .section {
+    border-bottom: 0;
+}
+.format-socialwall .tl-posts .editing_move {
+    display: none;
+}
+
+.format-socialwall .attachactivies {
+    padding: 5px;
+    border: 2px dashed #cccccc;
+    margin-bottom: 10px;
+}
+
+.format-socialwall .tl-actionlink a {
+    margin-right: 5px;
+}
+
+.format-socialwall .jsenabled .tllocksubmit {
+    display:none;
+}
+
+.format-socialwall .pf-notificationsetting {
+    float:right;
+}
+
+.format-socialwall .tl_gradednote {
+    border: 1px solid #cccccc;
+    padding: 4px;
+    margin: 5px 0px;
+    list-style: none;
+}
+
+.format-socialwall #tl-posts .section .activity .mod-indent-outer {
+    padding-left: 0px;
+}
+
+.format-socialwall .tl-post-actionarea {
+    border-top: 1px solid #cccccc;
+    padding: 4px;
+    background: #efefef;
+}
+
+.format-socialwall #externalurlwrapper {
+    background:#efefef;
+    padding: 5px;
+}
+
+.format-socialwall.tl-commentform .fitemtitle {
+    display:none;
+}
+
+.format-socialwall .tl-commentform .mform .fitem .felement.ftextarea {
+    margin-left: 0;
+}
+
+.format-socialwall .tl-commentform .tl-commenttext {
+    width: 97%;
+}
+
+.format-socialwall #tl-posts .editing_duplicate {
+    display:none
+}
