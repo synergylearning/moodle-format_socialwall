@@ -16,7 +16,7 @@ Students (depending on capabilites) may:
 * comment on posts or reply to comments
 * view results and feedback of assignments in their timeline
 
-The eCommunity-Package includes:
+##The eCommunity-Package includes:
 *	a new Course Format (called socialwall, format_socialwall)
 
 Optional:
