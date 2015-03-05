@@ -17,9 +17,9 @@ Students (depending on capabilites) may:
 * view results and feedback of assignments in their timeline
 
 The eCommunity-Package includes:
-•	a new Course Format (called socialwall, format_socialwall)
+*	a new Course Format (called socialwall, format_socialwall)
 
 Optional:
-•	a new Filter (filter_urlresource) to alter the way a posted url-Resource will be displayed
-•	a local plugin (local_filterurlresbak) to backup and restore the filter data (unfortunately moodle doesn’t support backup and restore for filter data).
-•	a new Block to display upcoming events and alerts related to the course (block_alerts).
+*	a new Filter (filter_urlresource) to alter the way a posted url-Resource will be displayed
+*	a local plugin (local_filterurlresbak) to backup and restore the filter data (unfortunately moodle doesn’t support backup and restore for filter data).
+*	a new Block to display upcoming events and alerts related to the course (block_alerts).
