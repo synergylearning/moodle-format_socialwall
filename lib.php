@@ -31,7 +31,7 @@ require_once($CFG->dirroot . '/course/format/socialwall/pages/post_form.php');
  * Main class for the socialwall course format
  *
  * @package    format_socialwall
- * @copyright  2012 Marina Glancy
+ * @copyright  2014 Andreas Wagner, Synergy Learning
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class format_socialwall extends format_topics {
