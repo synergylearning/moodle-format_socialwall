@@ -149,3 +149,7 @@ $string['unknownuser'] = 'Unknown user';
 $string['uploadafile'] = 'Upload a file';
 $string['unlockpost'] = 'Post is locked, click to unlock';
 $string['writecomment'] = 'Write a comment';
+$string['cachedef_postformparams'] = 'SocialWall:Post form params';
+$string['cachedef_postformerrors'] = 'SocialWall:Post form errors';
+$string['cachedef_timelinefilter'] = 'SocialWall:Timeline filter';
+$string['cachedef_commentformerrors'] = 'SocialWall:Comment form errors';
