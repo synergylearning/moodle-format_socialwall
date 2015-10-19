@@ -32,7 +32,8 @@ class comment_form extends moodleform {
 
         $mform = & $this->_form;
         $postid = $this->_customdata['postid'];
-        $courseid = $this->_customdata['id'];
+        $courseid = $this->_customdata['courseid'];
+        $replycommentid = $this->_customdata['replycommentid'];
 
         // ...get errors from cache and set them to elements.
         $errorcache = cache::make('format_socialwall', 'commentformerrors');
@@ -43,22 +44,31 @@ class comment_form extends moodleform {
         }
         $errorcache->delete($postid);
 
-        $mform->addElement('textarea', 'text', '', array('class' => 'tl-commenttext', 'id' => 'commenttext_' . $postid));
+        $textareaparams = array('class' => 'tl-commenttext', 'id' => 'commenttext_' . $postid.'_'.$replycommentid);
+        $mform->addElement('textarea', 'text', '', $textareaparams);
         $mform->setType('text', PARAM_TEXT);
         $mform->addRule('text', null, 'required', null, 'client');
 
         $mform->addElement('hidden', 'postid', $postid);
         $mform->setType('postid', PARAM_INT);
 
-        $mform->addElement('hidden', 'id', $courseid);
-        $mform->setType('id', PARAM_INT);
+        $mform->addElement('hidden', 'courseid', $courseid);
+        $mform->setType('courseid', PARAM_INT);
 
         $mform->addElement('hidden', 'action', 'postcomment');
         $mform->setType('action', PARAM_TEXT);
 
-        $params = array('class' => 'tl-postcomment', 'id' => 'postcomment_' . $postid);
+        $mform->addElement('hidden', 'replycommentid', $replycommentid);
+        $mform->setType('replycommentid', PARAM_INT);
+
+        $params = array('class' => 'tl-postcomment', 'id' => 'postcomment_' . $postid.'_'.$replycommentid);
         $mform->addElement('submit', 'submitcomment', get_string('postcomment', 'format_socialwall'), $params);
     }
+
+    protected function get_form_identifier() {
+        return "comment_form_".$this->_customdata['replycommentid'];
+    }
+
 
     public function has_errors() {
         $mform = & $this->_form;

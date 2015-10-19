@@ -1,0 +1,5 @@
+{
+    "moodle-format_socialwall-addactivity": {
+        "requires": ["base", "node", "io", "moodle-core-notification-dialogue"]
+    }
+}

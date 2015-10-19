@@ -30,11 +30,13 @@ class action_handler {
         global $CFG;
 
         $postid = required_param('postid', PARAM_INT);
+        $replycommentid = required_param('replycommentid', PARAM_INT);
 
         require_once($CFG->dirroot . '/course/format/socialwall/pages/comment_form.php');
 
         $url = new \moodle_url('/course/format/socialwall/action.php');
-        $commentform = new \comment_form($url, array('postid' => $postid, 'id' => $course->id));
+        $commentform = new \comment_form($url, array('postid' => $postid,
+            'id' => $course->id, 'replycommentid' => $replycommentid));
 
         if ($data = $commentform->get_data()) {
 

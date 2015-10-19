@@ -118,6 +118,10 @@ class format_socialwall extends format_topics {
                     'default' => $courseconfig->tlnumcomments,
                     'type' => PARAM_INT,
                 ),
+                'tlnumreplies' => array(
+                    'default' => $courseconfig->tlnumreplies,
+                    'type' => PARAM_INT,
+                ),
                 'numsections' => array(
                     'default' => 3,
                     'type' => PARAM_INT,
@@ -125,12 +129,20 @@ class format_socialwall extends format_topics {
                 'deleteafterunenrol' => array(
                     'default' => $courseconfig->deleteafterunenrol,
                     'type' => PARAM_BOOL
+                ),
+                'deletemodspermanently' => array(
+                    'default' => $courseconfig->deleteafterunenrol,
+                    'type' => PARAM_BOOL
                 )
             );
         }
         if ($foreditform && !isset($courseformatoptions['enablenotification']['label'])) {
 
-            $numpostsmenu = array(
+            $nums = array(
+                '1' => 1,
+                '2' => 2,
+                '3' => 3,
+                '4' => 4,
                 '5' => 5,
                 '10' => 10,
                 '20' => 20
@@ -158,17 +170,28 @@ class format_socialwall extends format_topics {
                 'tlnumposts' => array(
                     'label' => new lang_string('tlnumposts', 'format_socialwall'),
                     'element_type' => 'select',
-                    'element_attributes' => array($numpostsmenu),
+                    'element_attributes' => array($nums),
                 ),
                 'tlnumcomments' => array(
                     'label' => new lang_string('tlnumcomments', 'format_socialwall'),
                     'element_type' => 'select',
-                    'element_attributes' => array($numpostsmenu),
+                    'element_attributes' => array($nums),
+                ),
+                'tlnumreplies' => array(
+                    'label' => new lang_string('tlnumreplies', 'format_socialwall'),
+                    'element_type' => 'select',
+                    'element_attributes' => array($nums),
                 ),
                 'deleteafterunenrol' => array(
                     'label' => new lang_string('deleteafterunenrol', 'format_socialwall'),
                     'element_type' => 'selectyesno',
                     'help' => 'deleteafterunenrol',
+                    'help_component' => 'format_socialwall'
+                ),
+                'deletemodspermanently' => array(
+                    'label' => new lang_string('deletemodspermanently', 'format_socialwall'),
+                    'element_type' => 'selectyesno',
+                    'help' => 'deletemodspermanently',
                     'help_component' => 'format_socialwall'
                 ),
                 'numsections' => array(

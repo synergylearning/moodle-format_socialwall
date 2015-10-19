@@ -26,7 +26,9 @@ namespace format_socialwall\local;
 /** class for timeline comments */
 class comments {
 
-    /** create instance as a singleton */
+    /** 
+     * Create instance as a singleton
+     */
     public static function instance() {
         static $comments;
 
@@ -38,13 +40,15 @@ class comments {
         return $comments;
     }
 
-    /** ... add all comments and add more authors to postsdata record
+    /** 
+     * Add all comments and add more authors to postsdata record
      * 
-     * @global recored $DB
-     * @param record $postsdata
+     * @param object $postsdata
      * @return boolean, true, if succeded
      */
-    public static function add_comments_to_posts(&$postsdata, $limitcomments = 0) {
+    public static function add_comments_to_posts(&$postsdata,
+                                                 $limitcomments = 0,
+                                                 $limitreplies = 0) {
         global $DB;
 
         if (empty($postsdata->posts)) {
@@ -53,10 +57,15 @@ class comments {
 
         $posts = $postsdata->posts;
 
-        if (!$comments = $DB->get_records_list('format_socialwall_comments', 'postid', array_keys($posts), 'timecreated DESC')) {
+        list($inpostid, $inpostparams) = $DB->get_in_or_equal(array_keys($posts));
+
+        $sql = "SELECT * FROM {format_socialwall_comments} WHERE postid {$inpostid} AND replycommentid = '0' ORDER BY timecreated DESC";
+
+        if (!$comments = $DB->get_records_sql($sql, $inpostparams)) {
             return false;
         }
 
+        $parentcommentids = array();
         foreach ($comments as $comment) {
 
             if (!isset($postsdata->posts[$comment->postid]->comments)) {
@@ -64,23 +73,83 @@ class comments {
                 $postsdata->posts[$comment->postid]->comments = array();
             }
 
-            if (!empty($limitcomments) and (count($postsdata->posts[$comment->postid]->comments) == $limitcomments)) {
+            if (!empty($limitcomments) and ( count($postsdata->posts[$comment->postid]->comments) == $limitcomments)) {
                 continue;
             }
             $postsdata->posts[$comment->postid]->comments[$comment->id] = $comment;
             $postsdata->authors[$comment->fromuserid] = $comment->fromuserid;
+
+            $parentcommentids[$comment->id] = $comment->id;
+        }
+
+        if (empty($parentcommentids)) {
+            return true;
+        }
+
+        // Add replies to comments.
+        if (!$replies = $DB->get_records_list('format_socialwall_comments', 'replycommentid', array_keys($parentcommentids), 'timecreated DESC')) {
+            return true;
+        }
+
+        foreach ($replies as $reply) {
+
+            $comment = $postsdata->posts[$reply->postid]->comments[$reply->replycommentid];
+
+            if (!isset($postsdata->posts[$comment->postid]->comments[$comment->id]->replies)) {
+
+                $postsdata->posts[$comment->postid]->comments[$comment->id]->replies = array();
+            }
+
+            if (!empty($limitreplies) and ( count($postsdata->posts[$comment->postid]->comments[$comment->id]->replies) == $limitreplies)) {
+                continue;
+            }
+
+            $postsdata->posts[$comment->postid]->comments[$comment->id]->replies[$reply->id] = $reply;
+            $postsdata->authors[$comment->fromuserid] = $reply->fromuserid;
         }
 
         return true;
     }
 
-    /** get all the data for displaying comments of a post
+    /**
+     * Get all the data for displaying all replies of one comment
      * 
-     * @global object $DB
+     * @return \stdClass object containing autors and comment of a post.
+     */
+    public function get_replies_data($comment) {
+        global $DB;
+
+        $repliesdata = new \stdClass();
+        $repliesdata->comment = $comment;
+
+        // Add replies to comment.
+        if (!$replies = $DB->get_records('format_socialwall_comments', array('replycommentid' => $comment->id), 'timecreated DESC')) {
+            return $repliesdata;
+        }
+
+        $repliesdata->comment->replies = $replies;
+
+        // Gather authors.
+        $autorids = array($comment->fromid);
+        foreach ($replies as $reply) {
+            $autorids[] = $reply->fromuserid;
+        }
+
+        // ... finally gather all the required userdata for authors.
+        if (!$repliesdata->authors = $DB->get_records_list('user', 'id', $autorids)) {
+            debugging('error while retrieving post authors');
+        }
+
+        return $repliesdata;
+    }
+
+    /**
+     * Get all the data for displaying comments of a post
+     * 
      * @param int $postid
      * @return \stdClass object containing autors and comment of a post.
      */
-    public function get_comments_data($postid) {
+    public function get_comments_data($postid, $limitcomments = 0, $limitreplies = 0) {
         global $DB;
 
         $postsdata = new \stdClass();
@@ -92,7 +161,11 @@ class comments {
         $postsdata->authors = array();
 
         // ...fetch comments and add them to $postdata.
-        $this->add_comments_to_posts($postsdata);
+        $this->add_comments_to_posts($postsdata, $limitcomments, $limitreplies);
+
+        if (empty($postsdata->authors)) {
+            return $postdata;
+        }
 
         // ... finally gather all the required userdata for authors.
         list($inuserids, $params) = $DB->get_in_or_equal(array_keys($postsdata->authors));
@@ -107,10 +180,29 @@ class comments {
         return $postsdata;
     }
 
-    /** save a new comment from submit
+    /**
+     * Refresh the count of replies for a comment.
+     *  
+     * @param int $commentid
+     * @return boolean|object false if no refresh, updated comment data
+     */
+    private function refresh_replies_count($commentid) {
+        global $DB;
+
+        if ($comment = $DB->get_record('format_socialwall_comments', array('id' => $commentid))) {
+
+            $comment->countreplies = $DB->count_records('format_socialwall_comments', array('replycommentid' => $commentid));
+            $comment->timemodified = time();
+
+            $DB->update_record('format_socialwall_comments', $comment);
+            return $comment;
+        }
+        return false;
+    }
+
+    /** 
+     * Save a new comment from submit
      * 
-     * @global record $USER
-     * @global object $DB
      * @param object $comment submitted data from form.
      * @return array result array to use for ajax and non ajax request.
      */
@@ -145,7 +237,7 @@ class comments {
 
         $result = array(
             'error' => '0', 'message' => 'commentsaved',
-            'commentid' => $comment->id, 'postid' => $comment->postid,
+            'commentid' => $comment->id, 'postid' => $comment->postid, 'replycommentid' => $comment->replycommentid,
             'countlikes' => 0, 'countcomments' => 0
         );
 
@@ -156,16 +248,21 @@ class comments {
             $result['countcomments'] = $post->countcomments;
         }
 
+        // If this new comment is a reply update the countreplies attribute.
+        if ($comment->replycommentid > 0) {
+            $result['countreplies'] = $this->refresh_replies_count($comment->replycommentid);
+        }
+
         // We use a instant enqueueing, if needed you might use events here.
         notification::enqueue_comment_created($comment);
 
         return $result;
     }
 
-    /** delete comment and refresh the number of comments in post table
+    /** 
+     * Delete comment and refresh the number of comments in post table
      * 
-     * @global object $DB
-     * @param tint $cid, id of comment.
+     * @param int $cid, id of comment.
      * @return array result
      */
     public function delete_comment($cid) {
@@ -179,9 +276,7 @@ class comments {
         // ...check capability.
         $coursecontext = \context_course::instance($comment->courseid);
 
-        $candeletecomment = (($comment->fromuserid == $USER->id) and
-                (has_capability('format/socialwall:deleteowncomment', $coursecontext)));
-
+        $candeletecomment = (($comment->fromuserid == $USER->id) and ( has_capability('format/socialwall:deleteowncomment', $coursecontext)));
         $candeletecomment = ($candeletecomment or has_capability('format/socialwall:deleteanycomment', $coursecontext));
 
         if (!$candeletecomment) {
@@ -205,6 +300,11 @@ class comments {
         if ($post = $posts->refresh_comments_count($comment->postid)) {
             $result['countlikes'] = $post->countlikes;
             $result['countcomments'] = $post->countcomments;
+        }
+
+        // If this new comment is a reply update the countreplies attribute.
+        if ($comment->replycommentid > 0) {
+            $result['countreplies'] = $this->refresh_replies_count($comment->replycommentid);
         }
 
         return $result;

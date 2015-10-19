@@ -23,14 +23,18 @@
 
 namespace format_socialwall\local;
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot . '/lib/gradelib.php');
 
-/** this class manages the relationship between posts and attached modules. */
+/** This class manages the relationship between posts and attached modules. */
 class attaches {
 
     protected $grades;
 
-    /** create instance as a singleton */
+    /** 
+     * Create instance as a singleton
+     */
     public static function instance() {
         static $attaches;
 
@@ -42,11 +46,10 @@ class attaches {
         return $attaches;
     }
 
-    /** add info about this users attaches to the postsdata object
+    /** 
+     * Add info about this users attaches to the postsdata object
      * 
-     * @global object $DB
-     * @global record $USER
-     * @param record $postsdata
+     * @param object $postsdata
      * @return boolean, true if succeded
      */
     public static function add_attaches_to_posts($courseid, &$postsdata) {
@@ -115,23 +118,25 @@ class attaches {
         return true;
     }
 
-    /** save a new comment from submit
+    /** 
+     * Save coursemoduleids attached to a post
      * 
-     * @global record $USER
-     * @global object $DB
      * @return array, result array.
      */
     public static function save_attaches($postid, $cmsequence) {
         global $DB;
 
+        // Delete all existing attachments.
+        $DB->delete_records('format_socialwall_attaches', array('postid' => $postid));
+
         if (empty($cmsequence)) {
-            return true;
+            return array('error' => '0', 'message' => 'attachessaved');
         }
 
         $cmids = explode(',', $cmsequence);
 
         if (empty($cmids)) {
-            return true;
+            return array('error' => '0', 'message' => 'attachessaved');
         }
 
         foreach ($cmids as $cmid) {
@@ -144,9 +149,9 @@ class attaches {
         return array('error' => '0', 'message' => 'attachessaved');
     }
 
-    /** delete all the information about the attached modules for a coursemodule
+    /** 
+     * Delete all the information about the attached modules for a coursemodule
      * 
-     * @global object $DB
      * @param int $cmid the id of the course module.
      */
     public static function cleanup_coursemoduledeleted($cmid) {

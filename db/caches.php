@@ -33,4 +33,7 @@ $definitions = array(
     'commentformerrors' => array(
         'mode' => cache_store::MODE_SESSION
     ),
+    'attachedrecentactivities' => array(
+        'mode' => cache_store::MODE_SESSION
+    )
 );

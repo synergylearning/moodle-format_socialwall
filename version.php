@@ -19,13 +19,15 @@
  *
  * @package    format
  * @subpackage socialwall
- * @copyright  2014 Andreas Wagner, Synergy Learning
+ * @copyright  2015 Andreas Wagner, Synergy Learning
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2015030200;        // The current plugin version (Date: YYYYMMDDXX).
+$plugin->version   = 2015101500;        // The current plugin version (Date: YYYYMMDDXX).
 $plugin->requires  = 2014050800;        // Requires this Moodle version.
 $plugin->component = 'format_socialwall';    // Full name of the plugin (used for diagnostics).
 $plugin->dependencies = array('format_topics' => 2014051200);
+$plugin->maturity = MATURITY_STABLE;
+$plugin->release   = '2.8';

@@ -138,4 +138,20 @@ $capabilities = array(
             'editingteacher' => CAP_ALLOW,
         )
     ),
+
+    'format/socialwall:updateanypost' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+        )
+    ),
+
+    'format/socialwall:updateownpost' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+        )
+    ),
 );

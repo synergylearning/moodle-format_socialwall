@@ -24,7 +24,7 @@
 define('AJAX_SCRIPT', true);
 require_once(dirname(__FILE__) . '../../../../config.php');
 
-$courseid = required_param('id', PARAM_INT); // ... coursemodule id.
+$courseid = required_param('courseid', PARAM_INT); // ... coursemodule id.
 $action = required_param('action', PARAM_ALPHA);
 
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
@@ -55,8 +55,9 @@ switch ($action) {
 
             $renderer = $PAGE->get_renderer('format_socialwall');
             $comment = $DB->get_record('format_socialwall_comments', array('id' => $result['commentid']));
+            $post = $DB->get_record('format_socialwall_posts', array('id' => $comment->postid));
 
-            $result['commenthtml'] = $renderer->render_ajax_loaded_comment($context, $comment, $USER);
+            $result['commenthtml'] = $renderer->render_ajax_loaded_comment($post, $context, $comment, $USER, $course);
         }
 
         echo json_encode($result);
@@ -81,6 +82,7 @@ switch ($action) {
         echo json_encode($result);
         die;
 
+    case 'showalldiscussions' :
     case 'showallcomments':
 
         $postid = required_param('postid', PARAM_INT);
@@ -94,13 +96,43 @@ switch ($action) {
             print_error('invalidcourseid', 'format_socialwall');
         }
 
+        $limitreplies = ($action == 'showalldiscussions') ? 0 : $course->tlnumreplies;
+
         $comments = \format_socialwall\local\comments::instance();
-        $commentsdata = $comments->get_comments_data($postid);
+        $commentsdata = $comments->get_comments_data($postid, 0, $limitreplies);
 
         $renderer = $PAGE->get_renderer('format_socialwall');
-        $commentshtml = $renderer->render_ajax_loaded_comments($postid, $context, $commentsdata);
+        $commentshtml = $renderer->render_ajax_loaded_comments($postid, $context, $commentsdata, $course);
 
         echo json_encode(array('error' => '0', 'postid' => $postid, 'commentshtml' => $commentshtml));
+        die;
+
+    case 'showallreplies':
+
+        $replycommentid = required_param('replycommentid', PARAM_INT);
+
+        // Ensure that post exists and get the correct courseid.
+
+        if (!$comment = $DB->get_record('format_socialwall_comments', array('id' => $replycommentid))) {
+            print_error('invalidcommentid', 'format_socialwall');
+        }
+
+        if (!$post = $DB->get_record('format_socialwall_posts', array('id' => $comment->postid))) {
+            print_error('invalidpostid', 'format_socialwall');
+        }
+
+        if ($post->courseid <> $course->id) {
+            print_error('invalidcourseid', 'format_socialwall');
+        }
+
+        $comments = \format_socialwall\local\comments::instance();
+        $repliesdata = $comments->get_replies_data($comment);
+
+        $renderer = $PAGE->get_renderer('format_socialwall');
+        $replieshtml = $renderer->render_ajax_loaded_replies($post, $context, $repliesdata, $course);
+
+        echo json_encode(array('error' => '0', 'postid' => $post->id,
+            'replycommentid' => $replycommentid, 'replieshtml' => $replieshtml));
         die;
 
     case 'loadmoreposts' :
@@ -125,13 +157,16 @@ switch ($action) {
 
         // Here we store the values of postformelement for the case the user turns editing after
         // he has done some input.
+
+        $postid = optional_param('postid', 0, PARAM_INT);
+
         $cache = cache::make('format_socialwall', 'postformparams');
-        $formparams = $cache->get($course->id);
+        $formparams = $cache->get($course->id.'_'.$postid);
         $formparams['posttext'] = optional_param('posttext', '', PARAM_RAW);
         $formparams['togroupid'] = optional_param('togroupid', 0, PARAM_INT);
         $formparams['poststatus'] = optional_param('poststatus', 0, PARAM_INT);
 
-        $cache->set($course->id, $formparams);
+        $cache->set($course->id.'_'.$postid, $formparams);
         die;
 
     default :

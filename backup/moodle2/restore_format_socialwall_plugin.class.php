@@ -95,11 +95,36 @@ class restore_format_socialwall_plugin extends restore_local_plugin {
         global $DB;
 
         $data = (object) $data;
+        $oldid = $data->id;
+
         $data->courseid = $this->task->get_courseid();
         $data->postid = $this->get_mappingid('socialwallpost', $data->postid);
         $data->fromuserid = $this->get_mappingid('user', $data->fromuserid);
 
-        $DB->insert_record('format_socialwall_comments', $data);
+        $newid = $DB->insert_record('format_socialwall_comments', $data);
+        $this->set_mapping('socialwallcomment', $oldid, $newid);
+    }
+
+    /**
+     * Process all the repliescomments ids.
+     * 
+     */
+    public function after_restore_course() {
+        global $DB;
+
+        $courseid = $this->task->get_courseid();
+
+        if (!$childcomments = $DB->get_records_select('format_socialwall_comments', " courseid = ? and replycommentid > 0", array($courseid))) {
+            return;
+        }
+
+        foreach ($childcomments as $comment) {
+
+            $comment->replycommentid = $this->get_mappingid('socialwallcomment', $comment->replycommentid);
+            $DB->update_record('format_socialwall_comments', $comment);
+
+        }
+
     }
 
     /**

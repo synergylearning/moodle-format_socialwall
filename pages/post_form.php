@@ -29,16 +29,19 @@ class post_form extends moodleform {
 
     // Define the form.
     protected function definition() {
-        global $OUTPUT, $PAGE, $COURSE, $CFG, $USER, $SESSION;
+        global $OUTPUT, $PAGE, $COURSE, $CFG, $USER;
 
         $mform = & $this->_form;
         $courseid = $this->_customdata['courseid'];
+        $postid = (!empty($this->_customdata['options']->postid)) ? $this->_customdata['options']->postid : 0;
+        // Update of save a post.
+        $action = ($postid > 0) ? 'updatepost' : 'savepost';
 
         $context = context_course::instance($courseid);
 
         // ...get formparameters from cache.
         $cache = cache::make('format_socialwall', 'postformparams');
-        $formparams = $cache->get($courseid);
+        $formparams = $cache->get($courseid . '_' . $postid);
 
         $loadposteditor = optional_param('loadposteditor', -1, PARAM_INT);
 
@@ -47,7 +50,7 @@ class post_form extends moodleform {
             $formparams['loadposteditor'] = $loadposteditor;
 
             // ...remember this setting, if page is reloaded.
-            $cache->set($courseid, $formparams);
+            $cache->set($courseid . '_' . $postid, $formparams);
         }
         // ...get errors from cache and set them to elements.
         $errorcache = cache::make('format_socialwall', 'postformerrors');
@@ -64,7 +67,13 @@ class post_form extends moodleform {
         $mform->setDefault('cmsequence', '');
 
         // ... posttext.
-        $mform->addElement('submit', 'submitbutton', get_string('savepost', 'format_socialwall'));
+        $buttongroup = array();
+        $buttongroup[] = $mform->createElement('submit', 'submitbutton', get_string($action, 'format_socialwall'));
+
+        if ($action == 'updatepost') {
+            $buttongroup[] = $mform->createElement('cancel');
+        }
+        $mform->addGroup($buttongroup);
 
         // ... htmleditor/texarea to post text.
         $canposthtml = has_capability('format/socialwall:posthtml', $context);
@@ -81,7 +90,6 @@ class post_form extends moodleform {
                 $element = $mform->getElement('posttext');
                 $element->setValue(array('text' => $formparams['posttext']));
             }
-
         } else {
 
             $mform->addElement('textarea', 'posttext', get_string('poststatusordnote', 'format_socialwall'), $params);
@@ -95,7 +103,7 @@ class post_form extends moodleform {
 
         // ... Select group.
         $groupmode = groups_get_course_groupmode($COURSE);
-        if (($groupmode == SEPARATEGROUPS) and !has_capability('moodle/course:managegroups', $context)) {
+        if (($groupmode == SEPARATEGROUPS) and ! has_capability('moodle/course:managegroups', $context)) {
             $allgroups = groups_get_all_groups($courseid, $USER->id);
         } else {
             $allgroups = groups_get_all_groups($courseid);
@@ -146,7 +154,7 @@ class post_form extends moodleform {
         // ... display the activites prepared for the next post only by a teacher.
         if ($PAGE->user_allowed_editing()) {
 
-            if (!isset($USER->editing) or (!$USER->editing)) {
+            if (!isset($USER->editing) or ( !$USER->editing)) {
 
                 $addstr = get_string('addactivityresource', 'format_socialwall');
                 $mform->addElement('submit', 'turneditingon', $addstr, array('id' => 'sw-addactivitylink'));
@@ -186,7 +194,7 @@ class post_form extends moodleform {
             }
 
             $loadfilemanager = optional_param('loadfilemanager', 0, PARAM_INT);
-            if ($canpostfile and ($loadfilemanager == 1)) {
+            if ($canpostfile and ( $loadfilemanager == 1)) {
 
                 $mform->addElement('html', html_writer::start_div('', array('id' => 'fileswrapper')));
 
@@ -210,8 +218,7 @@ class post_form extends moodleform {
 
             $mform->addElement('html', html_writer::start_div('', array('id' => 'externalurlwrapper', 'style' => $style)));
 
-            $mform->addElement('url', 'externalurl',
-                    get_string('externalurl', 'url'), array('size' => '60'), array('usefilepicker' => true));
+            $mform->addElement('url', 'externalurl', get_string('externalurl', 'url'), array('size' => '60'), array('usefilepicker' => true));
 
             $mform->setType('externalurl', PARAM_URL);
             if (isset($errors['externalurl'])) {
@@ -227,12 +234,17 @@ class post_form extends moodleform {
             $mform->addElement('html', html_writer::end_div());
         }
 
-        // Id of course, we are in.
-        $mform->addElement('hidden', 'id');
+        // Id of post to remember the update option for further pageloads.
+        $mform->addElement('hidden', 'id', 0, array('id' => 'id'));
         $mform->setType('id', PARAM_INT);
-        $mform->setDefault('id', $courseid);
+        $mform->setDefault('id', $postid);
 
-        $mform->addElement('hidden', 'action', 'savepost');
+        // Id of course we are in.
+        $mform->addElement('hidden', 'courseid');
+        $mform->setType('courseid', PARAM_INT);
+        $mform->setDefault('courseid', $courseid);
+
+        $mform->addElement('hidden', 'action', $action);
         $mform->setType('action', PARAM_TEXT);
         $mform->disable_form_change_checker();
     }
@@ -274,6 +286,63 @@ class post_form extends moodleform {
         }
 
         return $errors;
+    }
+
+    public function set_data($post) {
+        global $DB;
+
+        if ($post->id == 0) {
+            return;
+        }
+
+        // Get attached activities for existing post.
+        if ($cmids = $DB->get_records('format_socialwall_attaches', array('postid' => $post->id), '', 'coursemoduleid')) {
+            $cache = cache::make('format_socialwall', 'attachedrecentactivities');
+            $cache->set($post->courseid . '_' . $post->id, array_keys($cmids));
+            $post->cmsequence = implode(',', array_keys($cmids));
+        }
+
+        // Post was already loaded the first time so take values from cache, which are already loaded.
+        $cache = cache::make('format_socialwall', 'postformparams');
+        if ($formparams = $cache->get($post->courseid . '_' . $post->id)) {
+            return;
+        }
+
+        $post->poststatus = 0;
+
+        if (!empty($post->sticky)) {
+            $post->poststatus = 1;
+        }
+
+        if (!empty($post->private)) {
+            $post->poststatus = 2;
+        }
+
+        if (!empty($post->alert)) {
+            $post->poststatus = 4;
+        }
+
+        parent::set_data($post);
+
+        // Set the cache for this post to keep values during the next page changes.
+        $formparams = $cache->get($post->courseid . '_' . $post->id);
+        $formparams['posttext'] = $post->posttext;
+        $formparams['togroupid'] = $post->togroupid;
+        $formparams['poststatus'] = $post->poststatus;
+        $cache->set($post->courseid . '_' . $post->id, $formparams);
+
+        $mform = & $this->_form;
+        $element = $mform->getElement('posttext');
+        if ($element->getType() == 'editor') {
+            $element->setValue(array('text' => $post->posttext));
+        }
+    }
+
+    protected function get_form_identifier() {
+        global $USER;
+
+        $postid = (!empty($this->_customdata['options']->postid)) ? $this->_customdata['options']->postid : 0;
+        return get_class($this) . '_' . $postid . '_' . $USER->id;
     }
 
 }

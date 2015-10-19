@@ -26,5 +26,35 @@ function xmldb_format_socialwall_upgrade($oldversion) {
 
     $dbman = $DB->get_manager();
 
+    if ($oldversion < 2015072900) {
+
+        // Define field replycommentid to be added to format_socialwall_comments.
+        $table = new xmldb_table('format_socialwall_comments');
+        $field = new xmldb_field('replycommentid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'postid');
+
+        // Conditionally launch add field replycommentid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Socialwall savepoint reached.
+        upgrade_plugin_savepoint(true, 2015072900, 'format', 'socialwall');
+    }
+
+    if ($oldversion < 2015081801) {
+
+        // Define field countreplies to be added to format_socialwall_comments.
+        $table = new xmldb_table('format_socialwall_comments');
+        $field = new xmldb_field('countreplies', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'replycommentid');
+
+        // Conditionally launch add field countreplies.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Socialwall savepoint reached.
+        upgrade_plugin_savepoint(true, 2015081801, 'format', 'socialwall');
+    }
+
     return true;
 }

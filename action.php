@@ -23,8 +23,13 @@
  */
 require_once(dirname(__FILE__) . '../../../../config.php');
 
-$courseid = required_param('id', PARAM_INT); // ... course id.
+$courseid = required_param('courseid', PARAM_INT); // ... course id.
 $action = required_param('action', PARAM_ALPHA);
+
+// User has clicked the cancel-button in form.
+if (isset($_REQUEST['cancel'])) {
+    $action = 'cancel';
+}
 
 $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
 
@@ -47,6 +52,7 @@ $redirecturl = new moodle_url('/course/view.php', array('id' => $course->id));
 switch ($action) {
 
     case 'savepost' :
+    case 'updatepost':
 
         $posts = \format_socialwall\local\posts::instance($course->id);
         $postform = $posts->get_post_form();
@@ -120,6 +126,20 @@ switch ($action) {
     case 'deletecomment' :
 
         \format_socialwall\local\action_handler::delete_comment();
+        redirect($redirecturl);
+        break;
+
+    case 'cancel' :
+    case 'resetfilter' :
+        $cache = \cache::make('format_socialwall', 'timelinefilter');
+        $cache->purge();
+
+        $cache = \cache::make('format_socialwall', 'postformparams');
+        $cache->purge();
+
+        $cache = cache::make('format_socialwall', 'attachedrecentactivities');
+        $cache->purge();
+
         redirect($redirecturl);
         break;
 

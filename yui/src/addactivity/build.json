@@ -1,0 +1,10 @@
+{
+    "name": "moodle-format_socialwall-addactivity",
+    "builds": {
+        "moodle-format_socialwall-addactivity": {
+            "jsfiles": [
+                "addactivity.js"
+            ]
+        }
+    }
+}

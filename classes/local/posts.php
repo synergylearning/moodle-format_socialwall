@@ -15,7 +15,6 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- *
  * @since     Moodle 2.7
  * @package   format_socialwall
  * @copyright 2014 Andreas Wagner, Synergy Learning
@@ -24,8 +23,11 @@
 
 namespace format_socialwall\local;
 
-/** This class manages posts, which can created by users in a course with
- *  socialwall format.
+defined('MOODLE_INTERNAL') || die();
+
+/**
+ * This class manages posts, which can created by users in a course with
+ * socialwall format.
  */
 class posts {
 
@@ -37,7 +39,8 @@ class posts {
         $this->courseid = $courseid;
     }
 
-    /** create instance as a singleton 
+    /**
+     * Create instance as a singleton 
      * 
      * @param int $courseid
      * @return \format_socialwall\local\posts
@@ -53,9 +56,9 @@ class posts {
         return $posts;
     }
 
-    /** cleanup data, when a user is deleted
+    /**
+     * Cleanup data, when a user is deleted
      * 
-     * @global object $DB
      * @param int $userid
      * @return boolean true if succeeded
      */
@@ -81,15 +84,17 @@ class posts {
         return true;
     }
 
-    /** delete users post and comments, in user is unenrolled
+    /**
+     * Delete users post and comments, in user is unenrolled
      * 
-     * @global object $DB
      * @param int $userid
      * @param int $courseid 
      * @return boolean true when succeeded
      */
     public static function cleanup_userunrenolled($userid, $courseid) {
-        global $DB;
+        global $DB, $CFG;
+
+        require_once($CFG->dirroot.'/course/format/lib.php');
 
         // ...check coursesettings.
         if (!$course = $DB->get_record('course', array('id' => $courseid))) {
@@ -111,7 +116,8 @@ class posts {
         return true;
     }
 
-    /** cleanup all the data in the format socialwall tables 
+    /**
+     * Cleanup all the data in the format socialwall tables 
      * 
      * @param int $courseid, the course id.
      */
@@ -140,7 +146,8 @@ class posts {
      * 
      * @return object the post form
      */
-    public function get_post_form() {
+    public function get_post_form($postsdata = null) {
+        global $USER;
 
         // Count the activities in section == FORMAT_SOCIALWALL_POSTFORMSECTION.
         $modinfo = get_fast_modinfo($this->courseid);
@@ -153,11 +160,30 @@ class posts {
 
         $this->postform = new \post_form($actionurl, $formparams, 'post', '', array('id' => 'postform'));
 
+        // If the timeline is filtered by postid and this user has the capability to edit the post, load the posts data into form.
+        if (!empty($options->postid)) {
+
+            if (isset($postsdata->posts[$options->postid])) {
+
+                $post = $postsdata->posts[$options->postid];
+                $coursecontext = \context_course::instance($post->courseid);
+
+                // ... add edit icon, if edting is allowed.
+                $caneditpost = (($post->fromuserid == $USER->id) and ( has_capability('format/socialwall:updateownpost', $coursecontext)));
+                $caneditpost = ($caneditpost or has_capability('format/socialwall:updateanypost', $coursecontext));
+
+                if ($caneditpost) {
+                    $this->postform->set_data($post);
+                }
+            }
+        }
+
         return $this->postform;
     }
 
-    /** get and store filter setting for posts list in Session
-     *  for each course.
+    /**
+     * Get and store filter setting for posts list in Session
+     * for each course.
      * 
      * @param int $courseid
      * @return record filteroptions
@@ -174,9 +200,19 @@ class posts {
         if (!$timelinefilter = $cache->get($courseid)) {
 
             $timelinefilter = new \stdClass();
+            $timelinefilter->postid = 0;
             $timelinefilter->filtergroups = 0;
             $timelinefilter->filtermodules = '';
             $timelinefilter->orderby = 'timecreated desc';
+        }
+
+        $postid = optional_param('postid', '0', PARAM_INT);
+        if (!empty($postid)) {
+
+            $timelinefilter->postid = $postid;
+            $cache->set($courseid, $timelinefilter);
+
+            return $timelinefilter;
         }
 
         $changed = false;
@@ -206,9 +242,9 @@ class posts {
         return $timelinefilter;
     }
 
-    /** get all Posts (with authors) from the database by courseid
+    /**
+     * Get all Posts (with authors) from the database by courseid
      * 
-     * @global object $DB
      * @param int $course, with theme settings loaded.
      * @return \stdClass, postsdata (infodata for all posts).
      */
@@ -250,7 +286,7 @@ class posts {
             // ... if seperate groups are set and user is not allowed to see other groups set filter.
             $groupmode = groups_get_course_groupmode($COURSE);
 
-            if (($groupmode == SEPARATEGROUPS) and !has_capability('moodle/course:managegroups', $context)) {
+            if (($groupmode == SEPARATEGROUPS) and ! has_capability('moodle/course:managegroups', $context)) {
 
                 $keys = array(0); // To all participants.
 
@@ -275,6 +311,11 @@ class posts {
 
         if (!empty($options->filteralerts)) {
             $cond[] = " sp.alert = '1'";
+        }
+
+        if (!empty($options->postid)) {
+            $cond[] = " sp.id = ? ";
+            $params[] = $options->postid;
         }
 
         // ...show only one post on page, when option showalert is set.
@@ -313,10 +354,10 @@ class posts {
         return $postsdata;
     }
 
-    /** add all post data, which is necessary for rendering the posts
+    /**
+     * Add all post data, which is necessary for rendering the posts
      * 
-     * @global object $DB
-     * @param record $course
+     * @param object $course
      * @param  object $postsdata containing retrieved posts in $postdata->post
      * @return object the postdata object with all of the data added
      */
@@ -335,8 +376,8 @@ class posts {
             $postsdata->authors[$post->fromuserid] = $post->fromuserid;
         }
 
-        // ... add all comments and add more authors.
-        comments::add_comments_to_posts($postsdata, $course->tlnumcomments);
+        // ... add all comments, replies to comments and add more authors.
+        comments::add_comments_to_posts($postsdata, $course->tlnumcomments, $course->tlnumreplies);
 
         // ... add all likes from this user.
         $likes = likes::instance($course);
@@ -346,13 +387,7 @@ class posts {
         attaches::add_attaches_to_posts($courseid, $postsdata);
 
         // ... finally gather all the required userdata for authors.
-
-        $params = array();
-        list($inuserids, $params) = $DB->get_in_or_equal(array_keys($postsdata->authors));
-
-        $sql = "SELECT * FROM {user} WHERE id {$inuserids}";
-
-        if (!$users = $DB->get_records_sql($sql, $params)) {
+        if (!$users = $DB->get_records_list('user', 'id', array_keys($postsdata->authors))) {
             debugging('error while retrieving post authors');
         }
 
@@ -361,9 +396,10 @@ class posts {
         return $postsdata;
     }
 
-    /** get postdata object for all alerting posts
+    /**
+     * Get postdata object for all alerting posts
      * 
-     * @param record $course
+     * @param object $course
      * @param int $limitfrom
      * @param int $limitcount
      * @param array $orderby
@@ -377,7 +413,8 @@ class posts {
         return $this->get_all_posts($course, $options, $limitfrom, $limitcount, $orderby);
     }
 
-    /** get postdata object for timeline posts
+    /**
+     * Get postdata object for timeline posts
      * 
      * @param record $course
      * @param int $limitfrom
@@ -392,8 +429,9 @@ class posts {
         return $this->add_posts_data($course, $postsdata);
     }
 
-    /** if modules are attached to a post they must be moved to timeline section 
-     *  (normally section number 1).
+    /**
+     * If modules are attached to a post they must be moved to timeline section 
+     * (normally section number 1).
      * 
      * @param type $courseid
      * @param type $cmsequence
@@ -415,13 +453,10 @@ class posts {
         return $cmsequence;
     }
 
-    /** If user has attached a file to a post we must create a modul with type file
-     *  and attach it to post.
+    /**
+     * If user has attached a file to a post we must create a modul with type file
+     * and attach it to post.
      * 
-     * @global record $USER
-     * @global record $CFG
-     * @global record $COURSE
-     * @global object $DB
      * @param object $form  submitted data of form.
      * @return record the created module of type file.
      */
@@ -457,11 +492,9 @@ class posts {
         return $modinfo->coursemodule;
     }
 
-    /** if user has attached a url to a post, we must create a module with type url
+    /**
+     * If user has attached a url to a post, we must create a module with type url
      * 
-     * @global record $CFG
-     * @global record $COURSE
-     * @global object $DB
      * @param string $url the url string
      * @return record the created module of type url.
      */
@@ -490,27 +523,52 @@ class posts {
         return $modinfo->coursemodule;
     }
 
-    /** save a post using the submitted data
+    /**
+     * Save a post using the submitted data
      * 
-     * @global type $USER
-     * @global obejct $DB
      * @param type $data
      * @return type
      */
     public function save_post($data, $course) {
-        global $USER, $DB, $CFG;
+        global $USER, $DB, $CFG, $PAGE;
 
         require_once($CFG->dirroot . '/mod/url/locallib.php');
-        $context = \context_course::instance($data->id);
+        $context = \context_course::instance($data->courseid);
+
+        // ... create post.
+        $post = new \stdClass();
+        $update = false;
+
+        // If id is not empty, ensure that post is existing and test whether user is updating the post.
+        if (!empty($data->id)) {
+
+            if ($exists = $DB->get_record('format_socialwall_posts', array('id' => $data->id))) {
+                $post = $exists;
+
+                // Check, whether user is allowed to update the post.
+                $caneditpost = (($post->fromuserid == $USER->id) and ( has_capability('format/socialwall:updateownpost', $context)));
+                $caneditpost = ($caneditpost or has_capability('format/socialwall:updateanypost', $context));
+
+                if (!$caneditpost) {
+                    print_error('missingcapupdatepost', 'format_socialwall');
+                }
+                $update = true;
+            } else {
+                print_error('noposttoupdate', 'format_socialwall');
+            }
+        }
 
         // ...save when even a posttext or a externalurl or a file or a actvitiy is given.
         $cmsequence = $data->cmsequence;
 
-        // ... added activity?
+        // ... are there added activities?
         if (!empty($cmsequence)) {
 
-            $cmsequence = $this->check_and_move_module($data->id, $cmsequence);
-        } else {
+            $cmsequence = $this->check_and_move_module($data->courseid, $cmsequence);
+        }
+
+        // If user may not add any activity but may add a file or a link, replace existing files with new file.
+        if (!$PAGE->user_allowed_editing()) {
 
             // ... add a resource.
             if (!empty($data->files)) {
@@ -543,16 +601,14 @@ class posts {
             }
         }
 
-        if ((empty($data->posttext)) and (empty($cmsequence))) {
+        if ((empty($data->posttext)) and ( empty($cmsequence))) {
             print_error('attachmentorpostrequired', 'format_socialwall');
         }
 
-        // ... create post.
-        $post = new \stdClass();
-        $post->courseid = $data->id;
+        $post->courseid = $data->courseid;
         $post->fromuserid = $USER->id;
         $post->togroupid = $data->togroupid;
-        
+
         if (is_array($data->posttext)) {
             $posttext = $data->posttext['text'];
         } else {
@@ -575,14 +631,23 @@ class posts {
             $post->alert = 0;
         }
 
-        $post->timecreated = time();
-        $post->timemodified = $post->timecreated;
+        if ($update) {
 
-        $post->id = $DB->insert_record('format_socialwall_posts', $post);
+            $post->timemodified = time();
+            $DB->update_record('format_socialwall_posts', $post);
 
-        if (!empty($cmsequence)) {
-            attaches::save_attaches($post->id, $cmsequence);
+            // ...reset postid if post was updated.
+            $cache = \cache::make('format_socialwall', 'timelinefilter');
+            $cache->purge_current_user();
+        } else {
+
+            $post->timecreated = time();
+            $post->timemodified = $post->timecreated;
+
+            $post->id = $DB->insert_record('format_socialwall_posts', $post);
         }
+
+        attaches::save_attaches($post->id, $cmsequence);
 
         // We use a instant enqueueing, if needed you might use events here.
         notification::enqueue_post_created($post);
@@ -591,13 +656,17 @@ class posts {
         $cache = \cache::make('format_socialwall', 'postformparams');
         $cache->purge();
 
+        // ...clear the attached actvities.
+        $cache = \cache::make('format_socialwall', 'attachedrecentactivities');
+        $cache->purge();
+
         return array('error' => '0', 'message' => 'postsaved');
     }
 
-    /** delete comment and refresh the number of comments in post table
+    /**
+     * Delete comment and refresh the number of comments in post table
      * 
-     * @global object $DB
-     * @param tint $cid, id of comment.
+     * @param int $cid, id of comment.
      * @return array result
      */
     public function delete_post($pid) {
@@ -610,7 +679,7 @@ class posts {
 
         // ...check capability.
         $coursecontext = \context_course::instance($post->courseid);
-        $candeletepost = (($post->fromuserid == $USER->id) and (has_capability('format/socialwall:deleteownpost', $coursecontext)));
+        $candeletepost = (($post->fromuserid == $USER->id) and ( has_capability('format/socialwall:deleteownpost', $coursecontext)));
         $candeletepost = ($candeletepost or has_capability('format/socialwall:deleteanypost', $coursecontext));
 
         if (!$candeletepost) {
@@ -621,9 +690,42 @@ class posts {
         return array('error' => '0', 'message' => 'postdeleted');
     }
 
-    /** delete all posts of the user including the data related to users posts
+    /**
+     * Delete activities of all the posts of a user, when course format setting
+     * "deletemodspermanently" is set to yes and the activity is not attached to another post.
      * 
-     * @global object $DB
+     * @param int $userid
+     * @return boolean, true if at least one activitity is deleted.
+     */
+    protected static function delete_users_posts_activities($userid) {
+        global $DB;
+
+        // Get all modids having count = 1.
+        $sql = "SELECT a.coursemoduleid, count(*) as countmod
+                 FROM {format_socialwall_attaches} a
+                 JOIN {format_socialwall_posts} p ON (p.id = a.postid AND p.fromuserid = :userid)
+                 JOIN {format_socialwall_attaches} a2 ON (a2.coursemoduleid = a.coursemoduleid AND a2.postid = p.id)
+                 JOIN {course_format_options} o ON o.courseid = p.courseid
+                 WHERE o.format = 'socialwall' AND o.name = 'deletemodspermanently' AND o.value = '1'
+                 GROUP BY coursemoduleid
+                 HAVING countmod = '1'";
+
+        if (!$modcounts = $DB->get_records_sql($sql, array('userid' => $userid))) {
+            return false;
+        }
+
+        $cmids = array_keys($modcounts);
+
+        foreach ($cmids as $cmid) {
+            course_delete_module($cmid);
+        }
+
+        return true;
+    }
+
+    /**
+     * Delete all posts of the user including the data related to users posts
+     * 
      * @param int $userid
      */
     protected static function delete_users_posts($userid) {
@@ -643,6 +745,9 @@ class posts {
 
         $DB->execute($sql, array($userid));
 
+        // Delete all the activities attached to users posts only?
+        self::delete_users_posts_activities($userid);
+
         // ... delete attaches.
         $sql = "DELETE a FROM {format_socialwall_attaches} a
                 JOIN mdl_format_socialwall_posts p ON p.id = a.postid
@@ -661,9 +766,56 @@ class posts {
         $DB->delete_records('format_socialwall_posts', array('fromuserid' => $userid));
     }
 
-    /** delete all data related to a post
+    /**
+     * Delete activities, when course format setting "deletemodspermanently" is set
+     * to yes and the activitie is not attached to another post.
      * 
-     * @global obejct $DB
+     * @param int $pid, the id of the post.
+     * @return boolean, true when at least one acitivity is deleted.
+     */
+    protected static function delete_posts_activities($pid) {
+        global $DB, $CFG;
+
+        require_once($CFG->dirroot.'/course/format/lib.php');
+
+        // Get the course and check, whether the format is "socialwall".
+        $sql = "SELECT c.* FROM {course} c
+                JOIN {format_socialwall_posts} p ON p.courseid = c.id
+                WHERE p.id = :pid AND c.format = 'socialwall'";
+
+        if (!$course = $DB->get_record_sql($sql, array('pid' => $pid))) {
+            return false;
+        }
+
+        $course = course_get_format($course)->get_course();
+
+        if (empty($course->deletemodspermanently)) {
+            return false;
+        }
+
+        $sql = "SELECT a.coursemoduleid, count(*) as countmod
+                 FROM {format_socialwall_attaches} a
+                 JOIN {format_socialwall_posts} p ON (p.id = a.postid AND p.courseid = :courseid)
+                 JOIN {format_socialwall_attaches} a2 ON (a2.coursemoduleid = a.coursemoduleid AND a2.postid = :pid)
+                 GROUP BY coursemoduleid
+                 HAVING countmod = '1'";
+
+        if (!$modcounts = $DB->get_records_sql($sql, array('courseid' => $course->id, 'pid' => $pid))) {
+            return false;
+        }
+
+        $cmids = array_keys($modcounts);
+
+        foreach ($cmids as $cmid) {
+            course_delete_module($cmid);
+        }
+
+        return true;
+    }
+
+    /**
+     * Delete all data related to a post
+     * 
      * @param int $pid the id of the post
      */
     protected static function execute_delete($pid) {
@@ -675,6 +827,9 @@ class posts {
         // ... delete likes.
         $DB->delete_records('format_socialwall_likes', array('postid' => $pid));
 
+        // ... delete activities attached to this post only?
+        self::delete_posts_activities($pid);
+
         // ... delete attaches.
         $DB->delete_records('format_socialwall_attaches', array('postid' => $pid));
 
@@ -685,9 +840,9 @@ class posts {
         $DB->delete_records('format_socialwall_posts', array('id' => $pid));
     }
 
-    /** refresh the value of the countcomments column in format_socialwall table
+    /**
+     * Refresh the value of the countcomments column in format_socialwall table
      * 
-     * @global object $DB
      * @param int $postid
      */
     public function refresh_comments_count($postid) {
@@ -695,8 +850,7 @@ class posts {
 
         if ($post = $DB->get_record('format_socialwall_posts', array('id' => $postid))) {
 
-            $post->countcomments = $DB->count_records('format_socialwall_comments', array('postid' => $postid));
-            $post->timemodified = time();
+            $post->countcomments = $DB->count_records('format_socialwall_comments', array('postid' => $postid, 'replycommentid' => '0'));
 
             $DB->update_record('format_socialwall_posts', $post);
             return $post;
@@ -704,9 +858,9 @@ class posts {
         return false;
     }
 
-    /** refresh the value of the countlikes column in format_socialwall table
+    /**
+     * Refresh the value of the countlikes column in format_socialwall table
      * 
-     * @global object $DB
      * @param int $postid
      */
     public function refresh_likes_count($postid) {
@@ -715,7 +869,6 @@ class posts {
         if ($post = $DB->get_record('format_socialwall_posts', array('id' => $postid))) {
 
             $post->countlikes = $DB->count_records('format_socialwall_likes', array('postid' => $postid));
-            $post->timemodified = time();
 
             $DB->update_record('format_socialwall_posts', $post);
             return $post->countlikes;
@@ -723,9 +876,9 @@ class posts {
         return 0;
     }
 
-    /** save the locked state for a post
+    /**
+     * Save the locked state for a post
      * 
-     * @global object $DB
      * @return result array.
      */
     public function save_posts_locked_from_submit() {
@@ -757,9 +910,9 @@ class posts {
         return array('error' => '0', 'message' => 'postsaved', 'postid' => $post->id, 'locked' => "{$post->locked}");
     }
 
-    /** save the sticky state for a post
+    /**
+     * Save the sticky state for a post
      * 
-     * @global object $DB
      * @return result array.
      */
     public function makesticky() {

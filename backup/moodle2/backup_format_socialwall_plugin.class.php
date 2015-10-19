@@ -47,9 +47,9 @@ class backup_format_socialwall_plugin extends backup_local_plugin {
             $posts = new backup_nested_element('posts');
             $formatsocialwall->add_child($posts);
 
-            $post = new backup_nested_element('post', array(),
-                            array('id', 'fromuserid', 'togroupid', 'posttext', 'sticky',
-                                'private', 'alert', 'locked', 'countcomments', 'countlikes', 'timecreated', 'timemodified'));
+            $post = new backup_nested_element('post', array(), array('id', 'fromuserid', 'togroupid', 'posttext', 'sticky',
+                'private', 'alert', 'locked', 'countcomments', 'countlikes', 'timecreated', 'timemodified'));
+
             $posts->add_child($post);
             $post->set_source_table('format_socialwall_posts', array('courseid' => backup::VAR_PARENTID));
 
@@ -65,8 +65,8 @@ class backup_format_socialwall_plugin extends backup_local_plugin {
             $comments = new backup_nested_element('comments');
             $post->add_child($comments);
 
-            $comment = new backup_nested_element('comment', array(),
-                            array('id', 'postid', 'fromuserid', 'text', 'timecreated', 'timemodified'));
+            $comment = new backup_nested_element('comment', array(), array('id', 'postid',
+                'replycommentid', 'countreplies', 'fromuserid', 'text', 'timecreated', 'timemodified'));
 
             $comments->add_child($comment);
             $comment->set_source_table('format_socialwall_comments', array('postid' => backup::VAR_PARENTID));
