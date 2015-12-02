@@ -194,10 +194,6 @@ class format_socialwall extends format_topics {
                     'help' => 'deletemodspermanently',
                     'help_component' => 'format_socialwall'
                 ),
-                'numsections' => array(
-                    'label' => '',
-                    'element_type' => 'hidden'
-                )
             );
             $courseformatoptions = array_merge_recursive($courseformatoptions, $courseformatoptionsedit);
         }
