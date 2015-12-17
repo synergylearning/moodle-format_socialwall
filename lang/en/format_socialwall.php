@@ -38,6 +38,7 @@ $string['attachedrecentactivities'] = 'Attached existing activities (will be sen
 $string['attachselectedactivities'] = 'Attach selected activities';
 $string['attachturnediton'] = 'Turn editing on, to attach activities to post';
 $string['attachedactivities'] = 'Attached activities (will be sent by next post):';
+$string['cachedef_attachedrecentactivities'] = 'SocialWall:Attached recent activities';
 $string['cachedef_commentformerrors'] = 'SocialWall:Comment form errors';
 $string['cachedef_postformerrors'] = 'SocialWall:Post form errors';
 $string['cachedef_postformparams'] = 'SocialWall:Post form params';

@@ -35,6 +35,8 @@ require_once($CFG->dirroot . '/course/format/socialwall/pages/post_form.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class format_socialwall extends format_topics {
+    
+    public static $numsections = 3;
 
     /**
      * Custom action after section has been moved in AJAX mode
@@ -123,7 +125,7 @@ class format_socialwall extends format_topics {
                     'type' => PARAM_INT,
                 ),
                 'numsections' => array(
-                    'default' => 3,
+                    'default' => self::$numsections,
                     'type' => PARAM_INT,
                 ),
                 'deleteafterunenrol' => array(
@@ -195,13 +197,15 @@ class format_socialwall extends format_topics {
                     'help_component' => 'format_socialwall'
                 ),
                 'numsections' => array(
-                    'label' => '',
+                    // Hidden element needs label value for correct setting of value, because label value is the 3rd parameter for addElement() method.
+                    'label' => self::$numsections,
                     'element_type' => 'hidden'
+                    
                 )
             );
             $courseformatoptions = array_merge_recursive($courseformatoptions, $courseformatoptionsedit);
         }
+
         return $courseformatoptions;
     }
-
 }

@@ -175,10 +175,9 @@ M.format_socialwall.addactivityinit = function (data) {
             if (recentactivities) {
 
                 recentactivities.each(
-
-                    function (node) {
-                        node.show();
-                    }
+                        function (node) {
+                            node.show();
+                        }
                 );
             }
             return false;
@@ -189,7 +188,6 @@ M.format_socialwall.addactivityinit = function (data) {
         }
 
         recentactivities.each(
-
                 function (node) {
 
                     var label = node.one('span.instancename');
@@ -223,13 +221,19 @@ M.format_socialwall.addactivityinit = function (data) {
 
         initDialog();
 
-        Y.one('#fgroup_id_filterbytype').delegate('click', function (e) {
-            onClickFilterByType();
-        }, 'input[id^="type_"]');
+        var typefilter = Y.one('#fgroup_id_filterbytype');
+        if (typefilter) {
+            typefilter.delegate('click', function (e) {
+                onClickFilterByType();
+            }, 'input[id^="type_"]');
+        }
 
-        Y.one('#id_searchbyname').on('keyup', function (e) {
-            onChangeSearchName(this);
-        });
+        var searchbyname = Y.one('#id_searchbyname');
+        if (searchbyname) {
+            searchbyname.on('keyup', function (e) {
+                onChangeSearchName(this);
+            });
+        }
 
         var control = Y.one('#tl-addrecentactivity-text');
         var link = Y.one('#tl-addrecentactivity-link');

@@ -38,6 +38,8 @@ class addactivity_form extends moodleform {
         $modinfo = get_fast_modinfo($courseid);
         $cms = $modinfo->get_cms();
 
+        $attachedrecentactivities = array();
+
         // Add activities area.
         $modulenames = get_module_types_names();
 
@@ -65,51 +67,50 @@ class addactivity_form extends moodleform {
             $mform->addElement('text', 'searchbyname', '', $params);
             $mform->setType('searchbyname', PARAM_TEXT);
 
+            // Recent activities area.
+            $mform->addElement('header', 'recentactivitiesheader', get_string('recentactivities', 'format_socialwall'));
+            $mform->setExpanded('recentactivitiesheader');
+
+            $courserenderer = $PAGE->get_renderer('course');
+
+            $modids = array();
+            $cache = cache::make('format_socialwall', 'attachedrecentactivities');
+
+            if ($attachedrecentactivities = $cache->get($courseid . '_' . $postid)) {
+                $modids = array_flip($attachedrecentactivities);
+            }
+
+            // Order cms by name.
+            if (!empty($cms)) {
+                uasort($cms, array($this, 'compare_modules'));
+            }
+
+            foreach ($cms as $mod) {
+
+                $name = $courserenderer->course_section_cm_name($mod);
+                $type = $mod->modname;
+
+                // In case of empty name, try to get content.
+                if (empty($name)) {
+
+                    $contentpart = $courserenderer->course_section_cm_text($mod);
+                    $url = $mod->url;
+
+                    if (empty($url)) {
+                        $name = shorten_text($contentpart, 70);
+                    }
+                }
+
+                $mform->addElement('checkbox', 'module_' . $type . '_' . $mod->id, '', $name, array('id' => 'module_' . $mod->id));
+
+                if (isset($modids[$mod->id])) {
+                    $mform->setDefault('module_' . $type . '_' . $mod->id, 1);
+                }
+            }
         } else {
             $mform->addElement('html', get_string('norecentactivities', 'format_socialwall'));
         }
 
-        // Recent activities area.
-        $mform->addElement('header', 'recentactivitiesheader', get_string('recentactivities', 'format_socialwall'));
-        $mform->setExpanded('recentactivitiesheader');
-        
-        $courserenderer = $PAGE->get_renderer('course');
-
-        $modids = array();
-        $cache = cache::make('format_socialwall', 'attachedrecentactivities');
-
-        if ($attachedrecentactivities = $cache->get($courseid . '_' . $postid)) {
-            $modids = array_flip($attachedrecentactivities);
-        }
-
-        // Order cms by name.
-        if (!empty($cms)) {
-            uasort($cms, array($this, 'compare_modules'));
-        }
-
-        foreach ($cms as $mod) {
-
-            $name = $courserenderer->course_section_cm_name($mod);
-            $type = $mod->modname;
-
-            // In case of empty name, try to get content.
-            if (empty($name)) {
-
-                $contentpart = $courserenderer->course_section_cm_text($mod);
-                $url = $mod->url;
-
-                if (empty($url)) {
-                    $name = shorten_text($contentpart, 70);
-                }
-            }
-
-            $mform->addElement('checkbox', 'module_' . $type . '_' . $mod->id, '', $name, array('id' => 'module_' . $mod->id));
-
-            if (isset($modids[$mod->id])) {
-                $mform->setDefault('module_' . $type . '_' . $mod->id, 1);
-            }
-        }
-        
         $args = array(
             'courseid' => $courseid,
             'attachedrecentactivities' => $attachedrecentactivities
