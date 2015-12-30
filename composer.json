@@ -1,0 +1,9 @@
+{
+    "name": "synergylearning/moodle-format_socialwall",
+    "description": "This course format offers a timeline where teachers and students may post and/or comment on.",
+    "type": "moodle-format",
+    "license": "GPLv3",
+    "extra": {
+        "installer-name": "socialwall"
+    }
+}
