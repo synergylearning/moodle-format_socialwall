@@ -94,7 +94,7 @@ class posts {
     public static function cleanup_userunrenolled($userid, $courseid) {
         global $DB, $CFG;
 
-        require_once($CFG->dirroot.'/course/format/lib.php');
+        require_once($CFG->dirroot . '/course/format/lib.php');
 
         // ...check coursesettings.
         if (!$course = $DB->get_record('course', array('id' => $courseid))) {
@@ -108,7 +108,7 @@ class posts {
         }
 
         // ... delete posts of the user.
-        self::delete_users_posts($userid);
+        self::delete_users_posts($userid, $courseid);
 
         // ... delete comments of user.
         $DB->delete_records_select('format_socialwall_comments', 'fromuserid = ? AND courseid = ?', array($userid, $courseid));
@@ -248,8 +248,7 @@ class posts {
      * @param int $course, with theme settings loaded.
      * @return \stdClass, postsdata (infodata for all posts).
      */
-    protected function get_all_posts($course, $options = null, $limitfrom = 0,
-                                     $limitcount = 0, $orderby = array()) {
+    protected function get_all_posts($course, $options = null, $limitfrom = 0, $limitcount = 0, $orderby = array()) {
         global $DB, $COURSE, $USER;
 
         $courseid = $course->id;
@@ -405,8 +404,7 @@ class posts {
      * @param array $orderby
      * @return object postdata object with all data for rendering.
      */
-    public function get_alert_posts($course, $limitfrom = 0, $limitcount = 0,
-                                    $orderby = array()) {
+    public function get_alert_posts($course, $limitfrom = 0, $limitcount = 0, $orderby = array()) {
 
         $options = new \stdClass();
         $options->filteralerts = true;
@@ -697,20 +695,29 @@ class posts {
      * @param int $userid
      * @return boolean, true if at least one activitity is deleted.
      */
-    protected static function delete_users_posts_activities($userid) {
+    protected static function delete_users_posts_activities($userid, $courseid = 0) {
         global $DB;
-
+        
+        $where = " WHERE o.format = 'socialwall' AND o.name = 'deletemodspermanently' AND o.value = '1' ";
+        $params = array('userid' => $userid);
+        
+        // Checking courseid.
+        if (!empty($courseid)) {
+            $where .= " AND p.courseid = :courseid";
+            $params['courseid'] = $courseid;
+        }
+        
         // Get all modids having count = 1.
         $sql = "SELECT a.coursemoduleid, count(*) as countmod
                  FROM {format_socialwall_attaches} a
                  JOIN {format_socialwall_posts} p ON (p.id = a.postid AND p.fromuserid = :userid)
                  JOIN {format_socialwall_attaches} a2 ON (a2.coursemoduleid = a.coursemoduleid AND a2.postid = p.id)
                  JOIN {course_format_options} o ON o.courseid = p.courseid
-                 WHERE o.format = 'socialwall' AND o.name = 'deletemodspermanently' AND o.value = '1'
+                 {$where}
                  GROUP BY coursemoduleid
                  HAVING countmod = '1'";
 
-        if (!$modcounts = $DB->get_records_sql($sql, array('userid' => $userid))) {
+        if (!$modcounts = $DB->get_records_sql($sql, $params)) {
             return false;
         }
 
@@ -728,42 +735,57 @@ class posts {
      * 
      * @param int $userid
      */
-    protected static function delete_users_posts($userid) {
+    protected static function delete_users_posts($userid, $courseid = 0) {
         global $DB;
+
+        $cond = array();
+        $cond[] = " p.fromuserid = :userid ";
+
+        $params = array();
+        $params['userid'] = $userid;
+
+        // Restrict deletion to course.
+        if (!empty($courseid)) {
+            $cond[] = " p.courseid = :courseid";
+            $params['courseid'] = $courseid;
+        }
+
+        $where = "WHERE " . implode(" AND ", $cond);
 
         // ... delete comments.
         $sql = "DELETE c FROM {format_socialwall_comments} c
-                JOIN mdl_format_socialwall_posts p ON p.id = c.postid
-                WHERE p.fromuserid = ?";
+                JOIN mdl_format_socialwall_posts p ON p.id = c.postid {$where}";
 
-        $DB->execute($sql, array($userid));
+        $DB->execute($sql, $params);
 
         // ... delete likes.
         $sql = "DELETE l FROM {format_socialwall_likes} l
-                JOIN mdl_format_socialwall_posts p ON p.id = l.postid
-                WHERE p.fromuserid = ?";
+                JOIN mdl_format_socialwall_posts p ON p.id = l.postid {$where}";
 
-        $DB->execute($sql, array($userid));
+        $DB->execute($sql, $params);
 
         // Delete all the activities attached to users posts only?
-        self::delete_users_posts_activities($userid);
+        self::delete_users_posts_activities($userid, $courseid);
 
         // ... delete attaches.
         $sql = "DELETE a FROM {format_socialwall_attaches} a
-                JOIN mdl_format_socialwall_posts p ON p.id = a.postid
-                WHERE p.fromuserid = ?";
+                JOIN mdl_format_socialwall_posts p ON p.id = a.postid {$where}";
 
-        $DB->execute($sql, array($userid));
+        $DB->execute($sql, $params);
 
         // ... delete all the enqueued notifications about this post.
         $sql = "DELETE q FROM {format_socialwall_nfqueue} q
-                JOIN mdl_format_socialwall_posts p ON p.id = q.postid
-                WHERE p.fromuserid = ?";
+                JOIN mdl_format_socialwall_posts p ON p.id = q.postid {$where}";
 
-        $DB->execute($sql, array($userid));
+        $DB->execute($sql, $params);
 
         // ... finally delete post.
-        $DB->delete_records('format_socialwall_posts', array('fromuserid' => $userid));
+        $params = array('fromuserid' => $userid);
+        if (!empty($courseid)) {
+            $params['courseid'] = $courseid;
+        }
+
+        $DB->delete_records('format_socialwall_posts', $params);
     }
 
     /**
@@ -776,7 +798,7 @@ class posts {
     protected static function delete_posts_activities($pid) {
         global $DB, $CFG;
 
-        require_once($CFG->dirroot.'/course/format/lib.php');
+        require_once($CFG->dirroot . '/course/format/lib.php');
 
         // Get the course and check, whether the format is "socialwall".
         $sql = "SELECT c.* FROM {course} c

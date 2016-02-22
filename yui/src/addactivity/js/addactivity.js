@@ -43,9 +43,9 @@ M.format_socialwall.addactivityinit = function (data) {
             section: Y.WidgetStdMod.FOOTER
         };
 
-        dialog.hide();
         dialog.addButton(ok);
         dialog.addButton(cancel);
+        dialog.hide();
 
     }
 

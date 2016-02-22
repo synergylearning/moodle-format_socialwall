@@ -25,7 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2015121700;        // The current plugin version (Date: YYYYMMDDXX).
+$plugin->version   = 2016022200;        // The current plugin version (Date: YYYYMMDDXX).
 $plugin->requires  = 2014050800;        // Requires this Moodle version.
 $plugin->component = 'format_socialwall';    // Full name of the plugin (used for diagnostics).
 $plugin->dependencies = array('format_topics' => 2014051200);
