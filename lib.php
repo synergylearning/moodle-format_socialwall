@@ -50,19 +50,6 @@ class format_socialwall extends format_topics {
     }
 
     /**
-     * Returns the list of blocks to be automatically added for the newly created course
-     *
-     * @return array of default blocks, must contain two keys BLOCK_POS_LEFT and BLOCK_POS_RIGHT
-     *     each of values is an array of block names (for left and right side columns)
-     */
-    public function get_default_blocks() {
-        return array(
-            BLOCK_POS_LEFT => array(),
-            BLOCK_POS_RIGHT => array()
-        );
-    }
-
-    /**
      * The URL to use for the specified course (with section)
      *
      * Please note that course view page /course/view.php?id=COURSEID is hardcoded in many
