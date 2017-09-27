@@ -84,10 +84,12 @@ M.format_socialwall.addactivityinit = function (data) {
 
                     var id = node.get('id').split('_') [1];
                     var selectedElement = Y.one('#id_recentactivitiesheader .felement label[for="module_' + id + '"]');
+                    var withboost = false;
 
                     if (selectedElement === null) {
                         // Compatibility with boost theme based.
                         selectedElement = Y.one('#id_recentactivitiesheader .fitem span[data-itemid="' + id + '"]');
+                        withboost = true;
 
                         if (selectedElement === null) {
                             if (M.cfg.developerdebug) {
