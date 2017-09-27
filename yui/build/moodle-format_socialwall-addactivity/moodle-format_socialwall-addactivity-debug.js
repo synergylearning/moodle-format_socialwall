@@ -98,10 +98,17 @@ M.format_socialwall.addactivityinit = function (data) {
                     }
 
                     var li = Y.Node.create('<li></li>');
-                    var label = Y.Node.create('<label for="module_' + id + '"></li>');
                     var clone = selectedElement.cloneNode(true);
-                    li.append(label);
-                    label.append(clone);
+                    var label;
+
+                    if (withboost) {
+                        label = Y.Node.create('<label for="module_' + id + '"></li>');
+                        li.append(label);
+                        label.append(clone);
+                    } else {
+                        li.append(clone);
+                    }
+
                     selectedactivities.append(li);
 
                     attachrecentactivitiyids.push(id);
