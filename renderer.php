@@ -60,8 +60,7 @@ class format_socialwall_renderer extends format_topics_renderer {
             $postauthor = (object) array('firstname' => '', 'lastname' => get_string('unknownuser', 'format_socialwall'),
                         'firstnamephonetic' => '', 'lastnamephonetic' => '', 'middlename' => '', 'alternatename' => '');
 
-            $attributes = array('src' => $this->output->pix_url('u/user35'));
-            $o = html_writer::empty_tag('img', $attributes);
+            $o = $this->output->pix_icon('u/user35', get_string('unknownuser', 'format_socialwall'));
         }
 
         $o = html_writer::tag('div', $o, array('class' => 'tl-author'));
