@@ -172,7 +172,7 @@ class post_form extends moodleform {
 
             if ($canpostfile) {
 
-                $uploadfileicon = html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url('icon', 'resource')));
+                $uploadfileicon = $OUTPUT->pix_icon('icon', get_string('uploadafile', 'format_socialwall'), 'resource');
                 $linktext = $uploadfileicon . get_string('uploadafile', 'format_socialwall');
 
                 $url = new moodle_url('/course/view.php', array('id' => $courseid, 'loadfilemanager' => 1));
@@ -184,7 +184,7 @@ class post_form extends moodleform {
             $canposturl = (has_capability('format/socialwall:posturl', $context) && (!empty($course->enablestudentupload)));
 
             if ($canposturl) {
-                $addlinkicon = html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url('icon', 'url')));
+                $addlinkicon = $OUTPUT->pix_icon('icon', get_string('addalink', 'format_socialwall'), 'url');
                 $at = html_writer::link('#', $addlinkicon . get_string('addalink', 'format_socialwall'), array('id' => 'addalink'));
                 $attachgroup[] = $mform->createElement('static', 'addalink', '', $at);
             }

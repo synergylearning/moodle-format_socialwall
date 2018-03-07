@@ -36,8 +36,6 @@ require_once($CFG->dirroot . '/course/format/socialwall/pages/post_form.php');
  */
 class format_socialwall extends format_topics {
     
-    public static $numsections = 3;
-
     /**
      * Custom action after section has been moved in AJAX mode
      *
@@ -88,7 +86,6 @@ class format_socialwall extends format_topics {
      *
      * socialwall format uses the following options:
      * - coursedisplay
-     * - numsections
      * - hiddensections
      *
      * @param bool $foreditform
@@ -122,10 +119,6 @@ class format_socialwall extends format_topics {
                 ),
                 'tlnumreplies' => array(
                     'default' => $courseconfig->tlnumreplies,
-                    'type' => PARAM_INT,
-                ),
-                'numsections' => array(
-                    'default' => self::$numsections,
                     'type' => PARAM_INT,
                 ),
                 'deleteafterunenrol' => array(
@@ -195,12 +188,6 @@ class format_socialwall extends format_topics {
                     'element_type' => 'selectyesno',
                     'help' => 'deletemodspermanently',
                     'help_component' => 'format_socialwall'
-                ),
-                'numsections' => array(
-                    // Hidden element needs label value for correct setting of value, because label value is the 3rd parameter for addElement() method.
-                    'label' => self::$numsections,
-                    'element_type' => 'hidden'
-                    
                 )
             );
             $courseformatoptions = array_merge_recursive($courseformatoptions, $courseformatoptionsedit);
