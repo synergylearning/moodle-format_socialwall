@@ -73,7 +73,8 @@ class post_form extends moodleform {
         if ($action == 'updatepost') {
             $buttongroup[] = $mform->createElement('cancel');
         }
-        $mform->addGroup($buttongroup);
+        $group = $mform->addGroup($buttongroup);
+        $group->setAttributes(array('class' => 'fgroup_id_group_1'));
 
         // ... htmleditor/texarea to post text.
         $canposthtml = has_capability('format/socialwall:posthtml', $context);
@@ -148,7 +149,9 @@ class post_form extends moodleform {
         }
 
         if (count($postoptions) > 0) {
-            $mform->addGroup($postoptions);
+            $group = $mform->addGroup($postoptions);
+            $group->setAttributes(array('class' => 'fgroup_id_group_2'));
+
         }
 
         // ... display the activites prepared for the next post only by a teacher.
@@ -190,7 +193,8 @@ class post_form extends moodleform {
             }
 
             if (!empty($attachgroup)) {
-                $mform->addGroup($attachgroup);
+                $group = $mform->addGroup($attachgroup);
+                $group->setAttributes(array('class' => 'fgroup_id_group_3'));
             }
 
             $loadfilemanager = optional_param('loadfilemanager', 0, PARAM_INT);
