@@ -84,9 +84,32 @@ M.format_socialwall.addactivityinit = function (data) {
 
                     var id = node.get('id').split('_') [1];
                     var selectedElement = Y.one('#id_recentactivitiesheader .felement label[for="module_' + id + '"]');
+                    var withboost = false;
+
+                    if (selectedElement === null) {
+                        // Compatibility with boost theme based.
+                        selectedElement = Y.one('#id_recentactivitiesheader .fitem span[data-itemid="' + id + '"]');
+                        withboost = true;
+
+                        if (selectedElement === null) {
+                            if (M.cfg.developerdebug) {
+                            }
+                            return false;
+                        }
+                    }
+
                     var li = Y.Node.create('<li></li>');
                     var clone = selectedElement.cloneNode(true);
-                    li.append(clone);
+                    var label;
+
+                    if (withboost) {
+                        label = Y.Node.create('<label for="module_' + id + '"></li>');
+                        li.append(label);
+                        label.append(clone);
+                    } else {
+                        li.append(clone);
+                    }
+
                     selectedactivities.append(li);
 
                     attachrecentactivitiyids.push(id);
@@ -124,12 +147,13 @@ M.format_socialwall.addactivityinit = function (data) {
 
     function onClickFilterByType() {
 
-        var recentactivities = Y.all('#id_recentactivitiesheader div[id^="fitem_module_"]');
+        var recentactivities = Y.all('#id_recentactivitiesheader div.fitem');
+
         if (recentactivities) {
             recentactivities.hide();
         }
 
-        var checkedfilterelements = Y.all('#fgroup_id_filterbytype input[id^="type_"]');
+        var checkedfilterelements = Y.all('#id_filtersheader input[id^="type_"]');
 
         if (checkedfilterelements) {
 
@@ -140,6 +164,7 @@ M.format_socialwall.addactivityinit = function (data) {
                     var type = node.get('id').split('_') [1];
 
                     var shownactivities = Y.all('#id_recentactivitiesheader input[name^="module_' + type + '"]');
+
                     if (shownactivities) {
                         shownactivities.each(function (node) {
                             node.ancestor('.fitem').show();
@@ -170,7 +195,7 @@ M.format_socialwall.addactivityinit = function (data) {
     function onChangeSearchName(searchfield) {
 
         var searchtext = searchfield.get('value');
-        var recentactivities = Y.all('#id_recentactivitiesheader div[id^="fitem_module_"]');
+        var recentactivities = Y.all('#id_recentactivitiesheader div.fitem');
 
         if (searchtext.length < 3) {
 
@@ -223,7 +248,8 @@ M.format_socialwall.addactivityinit = function (data) {
 
         initDialog();
 
-        var typefilter = Y.one('#fgroup_id_filterbytype');
+        var typefilter = Y.one('#id_filtersheader');
+
         if (typefilter) {
             typefilter.delegate('click', function (e) {
                 onClickFilterByType();
@@ -251,8 +277,12 @@ M.format_socialwall.addactivityinit = function (data) {
 
         Y.one('window').on('resize', function (e) {
             onResizeDialog();
-        }
-        );
+        });
+
+        Y.one('#tl-addrecentactivity-form').on('submit', function(e) {
+            e.preventDefault();
+            return false;
+        });
     }
 
     initialize();

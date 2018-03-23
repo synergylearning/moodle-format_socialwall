@@ -8,6 +8,9 @@
 .course-content ul.socialwall li.section .right img.icon { padding: 0 0 4px 0;}
 .course-content ul.socialwall li.section .left .section-handle img.icon { padding:0; vertical-align: baseline; }
 
+.format-socialwall #postform {
+    width: 90%;
+}
 
 .format-socialwall #postform .fitem div.fitemtitle {
     float: none;
@@ -29,23 +32,24 @@
     margin-right: 5px;
 }
 
-.format-socialwall #postform .sw-texarea, #posttext {
+.format-socialwall #postform textarea.sw-texarea, #posttext {
     width:100%;
 }
 
-.format-socialwall #postform #fitem_posttext {
+.format-socialwall #postform #fitem_posttext,
+.format-socialwall #postform div.sw-texarea {
     margin-bottom: 0px;
     margin-right: 100px;
 }
 
-.format-socialwall #postform #fgroup_id_group_1 {
+.format-socialwall #postform .fgroup_id_group_1 {
     margin-top:30px;
     float:right;
     width:100px;
     text-align: right;
 }
 
-.format-socialwall #postform #fgroup_id_group_2 {
+.format-socialwall #postform .fgroup_id_group_2 {
     float:left;
 }
 
