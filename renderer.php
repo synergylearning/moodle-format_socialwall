@@ -38,8 +38,8 @@ class format_socialwall_renderer extends format_topics_renderer {
     protected $commentsformshow = 0;
 
     /**
-     * Get data for user and render author div to display author 
-     * 
+     * Get data for user and render author div to display author
+     *
      * @param int $userid
      * @param array $authors list of existing autors
      * @return array userdata of author and  HTML String for displaying users picture and name.
@@ -69,7 +69,7 @@ class format_socialwall_renderer extends format_topics_renderer {
 
     /**
      * Renders the string for displaying how long ago is a comment posted
-     * 
+     *
      * @param int $time timestamp for posted time
      * @return string
      */
@@ -121,7 +121,7 @@ class format_socialwall_renderer extends format_topics_renderer {
 
     /**
      * Render a reply for a comment
-     * 
+     *
      * @param object $post
      * @param object $comment
      * @param [object] $authors
@@ -144,7 +144,7 @@ class format_socialwall_renderer extends format_topics_renderer {
 
     /**
      * Renders a timeline comment
-     * 
+     *
      * @param record $comment
      * @param array $authors the already retrieved authors for posts and comments
      * @param object $coursecontext
@@ -205,7 +205,7 @@ class format_socialwall_renderer extends format_topics_renderer {
 
     /**
      * Renders all the comments for a post
-     * 
+     *
      * @param object $post
      * @param array $authors the already retrieved authors for posts and comments
      * @param course_context $context
@@ -228,7 +228,7 @@ class format_socialwall_renderer extends format_topics_renderer {
 
     /**
      * Render a form in the timeline
-     * 
+     *
      * @param int $courseid
      * @param string $fields HTML for the formelements.
      * @param array $params params for the form tag.
@@ -249,7 +249,7 @@ class format_socialwall_renderer extends format_topics_renderer {
 
     /**
      * Render grades, if timeline post contains gradable modules
-     * 
+     *
      * @param array $authors the already retrieved authors for posts and comments
      * @param record $gradedata
      * @return string HTML for grading information
@@ -275,7 +275,7 @@ class format_socialwall_renderer extends format_topics_renderer {
 
     /**
      * Render the form to write a timeline comment or a reply to a comment
-     * 
+     *
      * @param string $actionlink the HTML output, where this HTML will be added
      * @param course_context $coursecontext
      * @param object $post
@@ -326,7 +326,7 @@ class format_socialwall_renderer extends format_topics_renderer {
 
     /**
      * Renders a timeline post.
-     * 
+     *
      * @param object $course
      * @param object $post
      * @param object $completion
@@ -531,7 +531,7 @@ class format_socialwall_renderer extends format_topics_renderer {
 
     /**
      * Renders a form for filtering and ording the timeline posts
-     * 
+     *
      * @param object $course
      * @param object $filteroptions
      * @return string HTML for the form.
@@ -606,7 +606,7 @@ class format_socialwall_renderer extends format_topics_renderer {
 
     /**
      * Print out the first section (i. e. section number 0) for the course
-     * 
+     *
      * @param object $course
      * @param section_info $sectioninfo
      */
@@ -626,7 +626,7 @@ class format_socialwall_renderer extends format_topics_renderer {
 
     /**
      * Print the section which contains the post form (i. e. section number 2)
-     * 
+     *
      * @global object $this->output
      * @param object $course
      * @param object $sectioninfo
@@ -726,7 +726,7 @@ class format_socialwall_renderer extends format_topics_renderer {
      * Render the form for attaching recent (existing) activities to the post form.
      * This is only generated when course is in edit mode and the form is initially hidden.
      * The HTML is used in the content of the add activity dialog.
-     * 
+     *
      * @param object $course
      * @return string HTML for the add (recent) activity form
      */
@@ -743,7 +743,7 @@ class format_socialwall_renderer extends format_topics_renderer {
 
     /**
      * Render the list of recent (i. e. activities, which are already created) attached activities.
-     * 
+     *
      * @param object $course
      * @return string HTML with the list of attached activities
      */
@@ -775,7 +775,7 @@ class format_socialwall_renderer extends format_topics_renderer {
 
     /**
      * Print out the timeline section (i. e. section number 1)
-     * 
+     *
      * @param object $course
      * @param object $postsdata all the gathered data to print posts
      * @param object $completion completion info of course
@@ -806,7 +806,7 @@ class format_socialwall_renderer extends format_topics_renderer {
 
     /**
      * Print out the course page
-     * 
+     *
      * @param object $course
      * @param completion_info $completioninfo
      */
@@ -862,7 +862,7 @@ class format_socialwall_renderer extends format_topics_renderer {
 
     /**
      * Render the posts loaded by an AJAX call
-     * 
+     *
      * @param object $course
      * @param object $postsdata data of post for rendering
      * @return string HTML for post
@@ -879,7 +879,7 @@ class format_socialwall_renderer extends format_topics_renderer {
 
     /**
      * Render the comment loaded by an AJAX call
-     * 
+     *
      * @param context_course $context
      * @param object $comment
      * @param object $author
@@ -894,8 +894,8 @@ class format_socialwall_renderer extends format_topics_renderer {
     }
 
     /**
-     * Render the comments loaded by an AJAX call 
-     * 
+     * Render the comments loaded by an AJAX call
+     *
      * @param int $postid id of post
      * @param context_course $context
      * @param object $commentsdata data render comments
@@ -914,8 +914,8 @@ class format_socialwall_renderer extends format_topics_renderer {
     }
 
     /**
-     * Render the replies loaded by an AJAX call 
-     * 
+     * Render the replies loaded by an AJAX call
+     *
      * @param object $post
      * @param context_course $context
      * @param object $commentsdata data render comments
