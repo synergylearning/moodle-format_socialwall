@@ -40,8 +40,8 @@ class posts {
     }
 
     /**
-     * Create instance as a singleton 
-     * 
+     * Create instance as a singleton
+     *
      * @param int $courseid
      * @return \format_socialwall\local\posts
      */
@@ -58,7 +58,7 @@ class posts {
 
     /**
      * Cleanup data, when a user is deleted
-     * 
+     *
      * @param int $userid
      * @return boolean true if succeeded
      */
@@ -86,9 +86,9 @@ class posts {
 
     /**
      * Delete users post and comments, in user is unenrolled
-     * 
+     *
      * @param int $userid
-     * @param int $courseid 
+     * @param int $courseid
      * @return boolean true when succeeded
      */
     public static function cleanup_userunrenolled($userid, $courseid) {
@@ -117,8 +117,8 @@ class posts {
     }
 
     /**
-     * Cleanup all the data in the format socialwall tables 
-     * 
+     * Cleanup all the data in the format socialwall tables
+     *
      * @param int $courseid, the course id.
      */
     public static function cleanup_coursedeleted($courseid) {
@@ -143,7 +143,7 @@ class posts {
     /**
      * Post form is neede in two separate scripts (view.php and action.php), so we create
      * it here in centralized place.
-     * 
+     *
      * @return object the post form
      */
     public function get_post_form($postsdata = null) {
@@ -184,7 +184,7 @@ class posts {
     /**
      * Get and store filter setting for posts list in Session
      * for each course.
-     * 
+     *
      * @param int $courseid
      * @return record filteroptions
      */
@@ -244,7 +244,7 @@ class posts {
 
     /**
      * Get all Posts (with authors) from the database by courseid
-     * 
+     *
      * @param int $course, with theme settings loaded.
      * @return \stdClass, postsdata (infodata for all posts).
      */
@@ -355,7 +355,7 @@ class posts {
 
     /**
      * Add all post data, which is necessary for rendering the posts
-     * 
+     *
      * @param object $course
      * @param  object $postsdata containing retrieved posts in $postdata->post
      * @return object the postdata object with all of the data added
@@ -397,7 +397,7 @@ class posts {
 
     /**
      * Get postdata object for all alerting posts
-     * 
+     *
      * @param object $course
      * @param int $limitfrom
      * @param int $limitcount
@@ -413,7 +413,7 @@ class posts {
 
     /**
      * Get postdata object for timeline posts
-     * 
+     *
      * @param record $course
      * @param int $limitfrom
      * @param int $limitcount
@@ -428,9 +428,9 @@ class posts {
     }
 
     /**
-     * If modules are attached to a post they must be moved to timeline section 
+     * If modules are attached to a post they must be moved to timeline section
      * (normally section number 1).
-     * 
+     *
      * @param type $courseid
      * @param type $cmsequence
      * @return type
@@ -454,7 +454,7 @@ class posts {
     /**
      * If user has attached a file to a post we must create a modul with type file
      * and attach it to post.
-     * 
+     *
      * @param object $form  submitted data of form.
      * @return record the created module of type file.
      */
@@ -492,7 +492,7 @@ class posts {
 
     /**
      * If user has attached a url to a post, we must create a module with type url
-     * 
+     *
      * @param string $url the url string
      * @return record the created module of type url.
      */
@@ -523,7 +523,7 @@ class posts {
 
     /**
      * Save a post using the submitted data
-     * 
+     *
      * @param type $data
      * @return type
      */
@@ -663,7 +663,7 @@ class posts {
 
     /**
      * Delete comment and refresh the number of comments in post table
-     * 
+     *
      * @param int $cid, id of comment.
      * @return array result
      */
@@ -691,22 +691,22 @@ class posts {
     /**
      * Delete activities of all the posts of a user, when course format setting
      * "deletemodspermanently" is set to yes and the activity is not attached to another post.
-     * 
+     *
      * @param int $userid
      * @return boolean, true if at least one activitity is deleted.
      */
     protected static function delete_users_posts_activities($userid, $courseid = 0) {
         global $DB;
-        
+
         $where = " WHERE o.format = 'socialwall' AND o.name = 'deletemodspermanently' AND o.value = '1' ";
         $params = array('userid' => $userid);
-        
+
         // Checking courseid.
         if (!empty($courseid)) {
             $where .= " AND p.courseid = :courseid";
             $params['courseid'] = $courseid;
         }
-        
+
         // Get all modids having count = 1.
         $sql = "SELECT a.coursemoduleid, count(*) as countmod
                  FROM {format_socialwall_attaches} a
@@ -732,7 +732,7 @@ class posts {
 
     /**
      * Delete all posts of the user including the data related to users posts
-     * 
+     *
      * @param int $userid
      */
     protected static function delete_users_posts($userid, $courseid = 0) {
@@ -791,7 +791,7 @@ class posts {
     /**
      * Delete activities, when course format setting "deletemodspermanently" is set
      * to yes and the activitie is not attached to another post.
-     * 
+     *
      * @param int $pid, the id of the post.
      * @return boolean, true when at least one acitivity is deleted.
      */
@@ -837,7 +837,7 @@ class posts {
 
     /**
      * Delete all data related to a post
-     * 
+     *
      * @param int $pid the id of the post
      */
     protected static function execute_delete($pid) {
@@ -864,7 +864,7 @@ class posts {
 
     /**
      * Refresh the value of the countcomments column in format_socialwall table
-     * 
+     *
      * @param int $postid
      */
     public function refresh_comments_count($postid) {
@@ -882,7 +882,7 @@ class posts {
 
     /**
      * Refresh the value of the countlikes column in format_socialwall table
-     * 
+     *
      * @param int $postid
      */
     public function refresh_likes_count($postid) {
@@ -900,7 +900,7 @@ class posts {
 
     /**
      * Save the locked state for a post
-     * 
+     *
      * @return result array.
      */
     public function save_posts_locked_from_submit() {
@@ -934,7 +934,7 @@ class posts {
 
     /**
      * Save the sticky state for a post
-     * 
+     *
      * @return result array.
      */
     public function makesticky() {
