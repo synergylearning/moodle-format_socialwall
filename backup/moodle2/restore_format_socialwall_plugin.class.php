@@ -107,7 +107,7 @@ class restore_format_socialwall_plugin extends restore_local_plugin {
 
     /**
      * Process all the repliescomments ids.
-     * 
+     *
      */
     public function after_restore_course() {
         global $DB;
