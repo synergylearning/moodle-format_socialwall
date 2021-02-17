@@ -26,7 +26,7 @@ namespace format_socialwall\local;
 /** class for timeline comments */
 class comments {
 
-    /** 
+    /**
      * Create instance as a singleton
      */
     public static function instance() {
@@ -40,9 +40,9 @@ class comments {
         return $comments;
     }
 
-    /** 
+    /**
      * Add all comments and add more authors to postsdata record
-     * 
+     *
      * @param object $postsdata
      * @return boolean, true, if succeded
      */
@@ -113,7 +113,7 @@ class comments {
 
     /**
      * Get all the data for displaying all replies of one comment
-     * 
+     *
      * @return \stdClass object containing autors and comment of a post.
      */
     public function get_replies_data($comment) {
@@ -145,7 +145,7 @@ class comments {
 
     /**
      * Get all the data for displaying comments of a post
-     * 
+     *
      * @param int $postid
      * @return \stdClass object containing autors and comment of a post.
      */
@@ -182,7 +182,7 @@ class comments {
 
     /**
      * Refresh the count of replies for a comment.
-     *  
+     *
      * @param int $commentid
      * @return boolean|object false if no refresh, updated comment data
      */
@@ -200,9 +200,9 @@ class comments {
         return false;
     }
 
-    /** 
+    /**
      * Save a new comment from submit
-     * 
+     *
      * @param object $comment submitted data from form.
      * @return array result array to use for ajax and non ajax request.
      */
@@ -259,9 +259,9 @@ class comments {
         return $result;
     }
 
-    /** 
+    /**
      * Delete comment and refresh the number of comments in post table
-     * 
+     *
      * @param int $cid, id of comment.
      * @return array result
      */
