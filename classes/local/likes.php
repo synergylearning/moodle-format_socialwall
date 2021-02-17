@@ -45,7 +45,7 @@ class likes {
     }
 
     /** add info about this users likes to the postsdata object
-     * 
+     *
      * @global object $DB
      * @global record $USER
      * @param record $postsdata
@@ -87,7 +87,7 @@ class likes {
     }
 
     /** save a new comment from submit
-     * 
+     *
      * @global record $USER
      * @global object $DB
      * @return array, result array.
