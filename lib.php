@@ -35,7 +35,7 @@ require_once($CFG->dirroot . '/course/format/socialwall/pages/post_form.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class format_socialwall extends format_topics {
-    
+
     /**
      * Custom action after section has been moved in AJAX mode
      *
