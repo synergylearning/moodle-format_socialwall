@@ -32,7 +32,7 @@ class attaches {
 
     protected $grades;
 
-    /** 
+    /**
      * Create instance as a singleton
      */
     public static function instance() {
@@ -46,9 +46,9 @@ class attaches {
         return $attaches;
     }
 
-    /** 
+    /**
      * Add info about this users attaches to the postsdata object
-     * 
+     *
      * @param object $postsdata
      * @return boolean, true if succeded
      */
@@ -118,9 +118,9 @@ class attaches {
         return true;
     }
 
-    /** 
+    /**
      * Save coursemoduleids attached to a post
-     * 
+     *
      * @return array, result array.
      */
     public static function save_attaches($postid, $cmsequence) {
@@ -149,9 +149,9 @@ class attaches {
         return array('error' => '0', 'message' => 'attachessaved');
     }
 
-    /** 
+    /**
      * Delete all the information about the attached modules for a coursemodule
-     * 
+     *
      * @param int $cmid the id of the course module.
      */
     public static function cleanup_coursemoduledeleted($cmid) {
