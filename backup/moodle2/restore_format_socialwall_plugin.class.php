@@ -114,7 +114,8 @@ class restore_format_socialwall_plugin extends restore_local_plugin {
 
         $courseid = $this->task->get_courseid();
 
-        if (!$childcomments = $DB->get_records_select('format_socialwall_comments', " courseid = ? and replycommentid > 0", array($courseid))) {
+        if (!$childcomments = $DB->get_records_select('format_socialwall_comments', " courseid = ? and replycommentid > 0",
+                array($courseid))) {
             return;
         }
 
