@@ -59,7 +59,11 @@ class comments {
 
         list($inpostid, $inpostparams) = $DB->get_in_or_equal(array_keys($posts));
 
-        $sql = "SELECT * FROM {format_socialwall_comments} WHERE postid {$inpostid} AND replycommentid = '0' ORDER BY timecreated DESC";
+        $sql = "SELECT *
+                  FROM {format_socialwall_comments}
+                 WHERE postid {$inpostid}
+                   AND replycommentid = '0'
+              ORDER BY timecreated DESC";
 
         if (!$comments = $DB->get_records_sql($sql, $inpostparams)) {
             return false;
@@ -87,7 +91,8 @@ class comments {
         }
 
         // Add replies to comments.
-        if (!$replies = $DB->get_records_list('format_socialwall_comments', 'replycommentid', array_keys($parentcommentids), 'timecreated DESC')) {
+        if (!$replies = $DB->get_records_list('format_socialwall_comments', 'replycommentid', array_keys($parentcommentids),
+            'timecreated DESC')) {
             return true;
         }
 
@@ -100,7 +105,8 @@ class comments {
                 $postsdata->posts[$comment->postid]->comments[$comment->id]->replies = array();
             }
 
-            if (!empty($limitreplies) and ( count($postsdata->posts[$comment->postid]->comments[$comment->id]->replies) == $limitreplies)) {
+            if (!empty($limitreplies)
+                && (count($postsdata->posts[$comment->postid]->comments[$comment->id]->replies) == $limitreplies)) {
                 continue;
             }
 
@@ -123,7 +129,8 @@ class comments {
         $repliesdata->comment = $comment;
 
         // Add replies to comment.
-        if (!$replies = $DB->get_records('format_socialwall_comments', array('replycommentid' => $comment->id), 'timecreated DESC')) {
+        if (!$replies = $DB->get_records('format_socialwall_comments', array('replycommentid' => $comment->id),
+            'timecreated DESC')) {
             return $repliesdata;
         }
 
@@ -276,7 +283,8 @@ class comments {
         // ...check capability.
         $coursecontext = \context_course::instance($comment->courseid);
 
-        $candeletecomment = (($comment->fromuserid == $USER->id) and ( has_capability('format/socialwall:deleteowncomment', $coursecontext)));
+        $candeletecomment = ($comment->fromuserid == $USER->id
+                            && has_capability('format/socialwall:deleteowncomment', $coursecontext));
         $candeletecomment = ($candeletecomment or has_capability('format/socialwall:deleteanycomment', $coursecontext));
 
         if (!$candeletecomment) {
