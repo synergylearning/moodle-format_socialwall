@@ -38,7 +38,7 @@ class editnotification_form extends moodleform {
         $notificationtype = $this->_customdata['notificationtype'];
 
         $choices = array();
-        foreach (\format_socialwall\local\notification::$NOTIFICATION_TYPE as $key => $type) {
+        foreach (\format_socialwall\local\notification::$notificationtype as $key => $type) {
             $choices[$key] = get_string($type, 'format_socialwall');
         }
 

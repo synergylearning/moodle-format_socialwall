@@ -52,7 +52,7 @@ class notification {
     protected $courses = array();
     protected $notificationsplaintext = array();
     protected $users = array();
-    public static $NOTIFICATION_TYPE = array(
+    public static $notificationtype = array(
         SOCIALWALL_NOTIFICATION_NO => 'notificationoff',
         SOCIALWALL_NOTIFICATION_INSTANT => 'notificationperpost',
         SOCIALWALL_NOTIFICATION_DIGEST => 'notificationdigest');
