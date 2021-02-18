@@ -222,7 +222,8 @@ class post_form extends moodleform {
 
             $mform->addElement('html', html_writer::start_div('', array('id' => 'externalurlwrapper', 'style' => $style)));
 
-            $mform->addElement('url', 'externalurl', get_string('externalurl', 'url'), array('size' => '60'), array('usefilepicker' => true));
+            $mform->addElement('url', 'externalurl', get_string('externalurl', 'url'),
+                array('size' => '60'), array('usefilepicker' => true));
 
             $mform->setType('externalurl', PARAM_URL);
             if (isset($errors['externalurl'])) {
