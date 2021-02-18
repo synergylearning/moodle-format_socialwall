@@ -90,7 +90,7 @@ class format_socialwall_testcase extends advanced_testcase {
         // Generate users.
         $user1 = $generator->create_user();
         $user2 = $generator->create_user();
-        // Setup a course with a attendance module inside
+        // Setup a course with a attendance module inside.
         $record = array('format' => 'socialwall');
         $course1 = $generator->create_course($record);
         $course2 = $generator->create_course($record);
