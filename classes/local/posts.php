@@ -758,7 +758,7 @@ class posts {
 
         // ... delete comments.
         $sql = "DELETE c FROM {format_socialwall_comments} c
-                JOIN mdl_format_socialwall_posts p ON p.id = c.postid {$where}";
+                JOIN {format_socialwall_posts} p ON p.id = c.postid {$where}";
 
         $DB->execute($sql, $params);
 
