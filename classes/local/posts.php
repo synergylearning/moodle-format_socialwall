@@ -764,7 +764,7 @@ class posts {
 
         // ... delete likes.
         $sql = "DELETE l FROM {format_socialwall_likes} l
-                JOIN mdl_format_socialwall_posts p ON p.id = l.postid {$where}";
+                JOIN {format_socialwall_posts} p ON p.id = l.postid {$where}";
 
         $DB->execute($sql, $params);
 
@@ -773,13 +773,13 @@ class posts {
 
         // ... delete attaches.
         $sql = "DELETE a FROM {format_socialwall_attaches} a
-                JOIN mdl_format_socialwall_posts p ON p.id = a.postid {$where}";
+                JOIN {format_socialwall_posts} p ON p.id = a.postid {$where}";
 
         $DB->execute($sql, $params);
 
         // ... delete all the enqueued notifications about this post.
         $sql = "DELETE q FROM {format_socialwall_nfqueue} q
-                JOIN mdl_format_socialwall_posts p ON p.id = q.postid {$where}";
+                JOIN {format_socialwall_posts} p ON p.id = q.postid {$where}";
 
         $DB->execute($sql, $params);
 
