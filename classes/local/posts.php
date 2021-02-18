@@ -151,7 +151,8 @@ class posts {
 
         // Count the activities in section == FORMAT_SOCIALWALL_POSTFORMSECTION.
         $modinfo = get_fast_modinfo($this->courseid);
-        $cmids = (isset($modinfo->sections[FORMAT_SOCIALWALL_POSTFORMSECTION])) ? $modinfo->sections[FORMAT_SOCIALWALL_POSTFORMSECTION] : array();
+        $cmids = (isset($modinfo->sections[FORMAT_SOCIALWALL_POSTFORMSECTION])) ?
+                $modinfo->sections[FORMAT_SOCIALWALL_POSTFORMSECTION] : array();
 
         $options = $this->get_filter_options($this->courseid);
         $formparams = array('courseid' => $this->courseid, 'cmids' => $cmids, 'options' => $options);
@@ -169,7 +170,8 @@ class posts {
                 $coursecontext = \context_course::instance($post->courseid);
 
                 // ... add edit icon, if edting is allowed.
-                $caneditpost = (($post->fromuserid == $USER->id) and ( has_capability('format/socialwall:updateownpost', $coursecontext)));
+                $caneditpost = ($post->fromuserid == $USER->id
+                               && has_capability('format/socialwall:updateownpost', $coursecontext));
                 $caneditpost = ($caneditpost or has_capability('format/socialwall:updateanypost', $coursecontext));
 
                 if ($caneditpost) {
@@ -544,7 +546,8 @@ class posts {
                 $post = $exists;
 
                 // Check, whether user is allowed to update the post.
-                $caneditpost = (($post->fromuserid == $USER->id) and ( has_capability('format/socialwall:updateownpost', $context)));
+                $caneditpost = ($post->fromuserid == $USER->id
+                                && has_capability('format/socialwall:updateownpost', $context));
                 $caneditpost = ($caneditpost or has_capability('format/socialwall:updateanypost', $context));
 
                 if (!$caneditpost) {
@@ -677,7 +680,8 @@ class posts {
 
         // ...check capability.
         $coursecontext = \context_course::instance($post->courseid);
-        $candeletepost = (($post->fromuserid == $USER->id) and ( has_capability('format/socialwall:deleteownpost', $coursecontext)));
+        $candeletepost = ($post->fromuserid == $USER->id
+                          && has_capability('format/socialwall:deleteownpost', $coursecontext));
         $candeletepost = ($candeletepost or has_capability('format/socialwall:deleteanypost', $coursecontext));
 
         if (!$candeletepost) {
@@ -872,7 +876,8 @@ class posts {
 
         if ($post = $DB->get_record('format_socialwall_posts', array('id' => $postid))) {
 
-            $post->countcomments = $DB->count_records('format_socialwall_comments', array('postid' => $postid, 'replycommentid' => '0'));
+            $post->countcomments = $DB->count_records('format_socialwall_comments',
+                    array('postid' => $postid, 'replycommentid' => '0'));
 
             $DB->update_record('format_socialwall_posts', $post);
             return $post;
