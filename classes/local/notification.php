@@ -305,7 +305,6 @@ class notification {
 
             if (DEBUG_MESSAGE == 1) {
                 echo ("<p><b>--- no cap, group: {$groupid}</b></p>");
-                // ...print_object($notification).
                 echo ('<br>Users:<br>');
                 $this->print_user($users);
             }
@@ -319,7 +318,6 @@ class notification {
 
             if (DEBUG_MESSAGE == 1) {
                 echo ("<p><b>--- one cap {$capability[0]}, group: {$groupid}</b></p>");
-                // ...print_object($notification).
                 echo ('<br>Users:<br>');
                 $this->print_user($users);
             }
@@ -334,7 +332,6 @@ class notification {
 
             if (DEBUG_MESSAGE == 1) {
                 echo ("<p><b>--- cap " . implode(", ", $capability) . ", group: {$groupid}</b></p>");
-                // ...print_object($notification).
                 echo ('<br>Users:<br>');
                 $this->print_user($users);
             }
