@@ -35,11 +35,11 @@ define('DEBUG_MESSAGE', 0);
 /**
  * 1- Notification uses intentionally an internal queue, so notification will be
  * independent from logging setting and would work even if log data wouldn't be stored.
- * 
+ *
  * 2- In a first approach Notification uses a instant (direct function call) event
- * handling. This can be easily changed to hook into events api, if you are 
+ * handling. This can be easily changed to hook into events api, if you are
  * interested in logging this events.
- * 
+ *
  * 3- events list:
  * postcreated
  * postlocked/postunlocked
@@ -52,7 +52,7 @@ class notification {
     protected $courses = array();
     protected $notificationsplaintext = array();
     protected $users = array();
-    public static $NOTIFICATION_TYPE = array(
+    public static $notificationtype = array(
         SOCIALWALL_NOTIFICATION_NO => 'notificationoff',
         SOCIALWALL_NOTIFICATION_INSTANT => 'notificationperpost',
         SOCIALWALL_NOTIFICATION_DIGEST => 'notificationdigest');
@@ -70,9 +70,9 @@ class notification {
     }
 
     /** write a record into database for later messaging via message provider "timelineposts"
-     *  recipientid = 0 means, this message is sent to all participiants of the course, 
+     *  recipientid = 0 means, this message is sent to all participiants of the course,
      *  which have sufficient capabilities to receive it.
-     * 
+     *
      * @global object $DB
      * @global object $USER
      * @param record $post
@@ -100,9 +100,9 @@ class notification {
     }
 
     /** write a record into database for later messaging via message provider "timelineposts"
-     *  recipientid = 0 means, this message is sent to all participiants of the course, 
+     *  recipientid = 0 means, this message is sent to all participiants of the course,
      *  which have sufficient capabilities to receive it.
-     * 
+     *
      * @global object $DB
      * @global object $USER
      * @param record $post
@@ -134,9 +134,9 @@ class notification {
     }
 
     /** write a record into database for later messaging via message provider "timelineposts"
-     *  recipientid = 0 means, this message is sent to all participiants of the course, 
+     *  recipientid = 0 means, this message is sent to all participiants of the course,
      *  which have sufficient capabilities to receive it.
-     * 
+     *
      * @global object $DB
      * @global object $USER
      * @param record $post
@@ -165,9 +165,9 @@ class notification {
     }
 
     /** write a record into database for later messaging via message provider "timelineposts"
-     *  recipientid = 0 means, this message is sent to all participiants of the course, 
+     *  recipientid = 0 means, this message is sent to all participiants of the course,
      *  which have sufficient capabilities to receive it.
-     * 
+     *
      * @global object $DB
      * @global object $USER
      * @param record $post
@@ -194,9 +194,9 @@ class notification {
     }
 
     /** write a record into database for later messaging via message provider "timelineposts"
-     *  recipientid = 0 means, this message is sent to all participiants of the course, 
+     *  recipientid = 0 means, this message is sent to all participiants of the course,
      *  which have sufficient capabilities to receive it.
-     * 
+     *
      * @global object $DB
      * @global object $USER
      * @param record $post
@@ -223,8 +223,8 @@ class notification {
         return true;
     }
 
-    /** get enqueued notifications for all users 
-     * 
+    /** get enqueued notifications for all users
+     *
      * @global object $DB
      * @param int $starttime, begin of period to retrieve notifications
      * @param int $endtime,  end of period to retrieve notifications
@@ -246,7 +246,7 @@ class notification {
     }
 
     /** print out all users for debuggin purposes
-     * 
+     *
      * @param type $users
      */
     protected function print_user($users) {
@@ -256,8 +256,8 @@ class notification {
     }
 
     /** get all the users, which are able to receive the given notification (includes
-     * checking some capabilities). 
-     * 
+     * checking some capabilities).
+     *
      * @param type $notification
      * @param type $course
      * @param type $context
@@ -305,7 +305,6 @@ class notification {
 
             if (DEBUG_MESSAGE == 1) {
                 echo ("<p><b>--- no cap, group: {$groupid}</b></p>");
-                // ...print_object($notification).
                 echo ('<br>Users:<br>');
                 $this->print_user($users);
             }
@@ -319,7 +318,6 @@ class notification {
 
             if (DEBUG_MESSAGE == 1) {
                 echo ("<p><b>--- one cap {$capability[0]}, group: {$groupid}</b></p>");
-                // ...print_object($notification).
                 echo ('<br>Users:<br>');
                 $this->print_user($users);
             }
@@ -334,7 +332,6 @@ class notification {
 
             if (DEBUG_MESSAGE == 1) {
                 echo ("<p><b>--- cap " . implode(", ", $capability) . ", group: {$groupid}</b></p>");
-                // ...print_object($notification).
                 echo ('<br>Users:<br>');
                 $this->print_user($users);
             }
@@ -344,8 +341,8 @@ class notification {
         return array();
     }
 
-    /** get and cache the course 
-     * 
+    /** get and cache the course
+     *
      * @global object $DB
      * @param int $courseid, the courseid
      * @return record
@@ -374,7 +371,7 @@ class notification {
     }
 
     /** add notification settings to the given user records
-     * 
+     *
      * @param array $users, array of user records.
      * @param int $courseid, courseid
      * @return int
@@ -435,7 +432,7 @@ class notification {
     }
 
     /** create a message using notification record
-     * 
+     *
      * @global object $DB
      * @param record $notification
      * @param record $course
@@ -471,7 +468,7 @@ class notification {
     }
 
     /** postpone the notification for digest message
-     * 
+     *
      * @global object $DB
      * @param record $notification
      * @param record $touser
@@ -486,16 +483,16 @@ class notification {
     }
 
     /** cron processing of instant notifications, it is recommended to call this method a cron every 60s.
-     *  
+     *
      *  The Method will do:
-     * 
+     *
      *  1- get all the notifications with recipientid == 0 (which means message is dedicated for all users in course)
      *  2- get all users which can receive the message (regrading capabilities and gorups)
      *  3- send out an instant message, postpone for digest or don't send message depending on users notification settings.
-     * 
-     * Note that checking cap and group is done for postponed notification (notifications with recipientid != 0), 
+     *
+     * Note that checking cap and group is done for postponed notification (notifications with recipientid != 0),
      * so in digest_cron(), we didn't have to check it on more time. :)
-     * 
+     *
      * @global type $CFG
      * @global object $DB
      */
@@ -624,10 +621,10 @@ class notification {
 
     /** process the digest notifications, this is normally done one time per day.
      *  if you have many notifications, it would be possible to:
-     * 
+     *
      *  1- schedule in night time.
      *  2- to reduce max processed notifications and do cron more times per day.
-     * 
+     *
      */
     public function digest_cron() {
         global $CFG, $DB;
@@ -712,7 +709,7 @@ class notification {
     }
 
     /** save the notification settings for a user
-     * 
+     *
      * @global object $DB
      * @param record $data, the submitted data.
      */
@@ -733,7 +730,7 @@ class notification {
 
     /** get the notification settings for a user in a course, return 0 when no
      * record in database exists.
-     * 
+     *
      * @param record $course the course
      * @param int $userid the id of the user.
      * @return int
@@ -750,7 +747,7 @@ class notification {
     }
 
     /** get all existing (in database) setting for the course
-     * 
+     *
      * @global object $DB
      * @param int $courseid, courseid.
      * @return array (userid => notification setting

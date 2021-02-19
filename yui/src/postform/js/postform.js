@@ -115,7 +115,9 @@ M.format_socialwall.postforminit = function (data) {
         // ...adapt counts.
         data.postsloaded = responsedata.postsloaded;
         data.poststotal = responsedata.poststotal;
-        var counttotalpost = M.str.format_socialwall.counttotalpost.replace('{$a->count}', data.postsloaded).replace('{$a->total}', data.poststotal);
+        var counttotalpost = M.str.format_socialwall.counttotalpost.replace('{$a->count}', data.postsloaded)
+            .replace('{$a->total}', data.poststotal);
+
         Y.one('#counttotalpost').setHTML(counttotalpost);
 
         loading = false;

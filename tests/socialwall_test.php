@@ -26,7 +26,7 @@ class format_socialwall_testcase extends advanced_testcase {
 
     /**
      * Unenrol user from course
-     * 
+     *
      * @global type $DB
      * @param type $user
      * @param type $course1
@@ -36,7 +36,7 @@ class format_socialwall_testcase extends advanced_testcase {
 
         // Get all the instances for that course.
         $sql = "SELECT e.*
-                FROM {user_enrolments} ue 
+                FROM {user_enrolments} ue
                 JOIN {enrol} e ON e.id = ue.enrolid AND e.courseid = :courseid
                 WHERE ue.userid = :userid";
 
@@ -75,7 +75,7 @@ class format_socialwall_testcase extends advanced_testcase {
     }
 
     /**
-     * Test whether the params deletemodspermanently and deleteafterunenrol of 
+     * Test whether the params deletemodspermanently and deleteafterunenrol of
      * course format works correctly, when unenrolling a user.
      */
     public function test_unenroluser() {
@@ -90,7 +90,7 @@ class format_socialwall_testcase extends advanced_testcase {
         // Generate users.
         $user1 = $generator->create_user();
         $user2 = $generator->create_user();
-        // Setup a course with a attendance module inside
+        // Setup a course with a attendance module inside.
         $record = array('format' => 'socialwall');
         $course1 = $generator->create_course($record);
         $course2 = $generator->create_course($record);
@@ -123,14 +123,14 @@ class format_socialwall_testcase extends advanced_testcase {
         // Try with different setting.
         $generator->enrol_user($user1->id, $course1->id, 5);
 
-        // Set deleteaferunenrol. 
+        // Set deleteafterunenrol.
         $DB->set_field('course_format_options', 'value', 1, array('format' => 'socialwall', 'name' => 'deleteafterunenrol'));
 
         format_socialwall::reset_course_cache();
         $course1 = course_get_format($course1)->get_course();
         $this->assertEquals(1, $course1->deleteafterunenrol);
 
-        // Set deletemodspermanently. 
+        // Set deletemodspermanently.
         $DB->set_field('course_format_options', 'value', 1, array('format' => 'socialwall', 'name' => 'deletemodspermanently'));
 
         format_socialwall::reset_course_cache();
@@ -145,7 +145,7 @@ class format_socialwall_testcase extends advanced_testcase {
         $this->assertEquals(0, $count);
 
         $count = $DB->count_records('label', array('id' => $label1->id));
-        $this->assertEquals(0, $count);
+        $this->assertEquals(1, $count);
 
         $count = $DB->count_records('format_socialwall_posts', array('fromuserid' => $user1->id, 'courseid' => $course2->id));
         $this->assertEquals(1, $count);

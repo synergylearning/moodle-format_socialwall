@@ -38,8 +38,8 @@ class format_socialwall_renderer extends format_topics_renderer {
     protected $commentsformshow = 0;
 
     /**
-     * Get data for user and render author div to display author 
-     * 
+     * Get data for user and render author div to display author
+     *
      * @param int $userid
      * @param array $authors list of existing autors
      * @return array userdata of author and  HTML String for displaying users picture and name.
@@ -60,8 +60,7 @@ class format_socialwall_renderer extends format_topics_renderer {
             $postauthor = (object) array('firstname' => '', 'lastname' => get_string('unknownuser', 'format_socialwall'),
                         'firstnamephonetic' => '', 'lastnamephonetic' => '', 'middlename' => '', 'alternatename' => '');
 
-            $attributes = array('src' => $this->output->pix_url('u/user35'));
-            $o = html_writer::empty_tag('img', $attributes);
+            $o = $this->output->pix_icon('u/user35', get_string('unknownuser', 'format_socialwall'));
         }
 
         $o = html_writer::tag('div', $o, array('class' => 'tl-author'));
@@ -70,7 +69,7 @@ class format_socialwall_renderer extends format_topics_renderer {
 
     /**
      * Renders the string for displaying how long ago is a comment posted
-     * 
+     *
      * @param int $time timestamp for posted time
      * @return string
      */
@@ -122,7 +121,7 @@ class format_socialwall_renderer extends format_topics_renderer {
 
     /**
      * Render a reply for a comment
-     * 
+     *
      * @param object $post
      * @param object $comment
      * @param [object] $authors
@@ -145,7 +144,7 @@ class format_socialwall_renderer extends format_topics_renderer {
 
     /**
      * Renders a timeline comment
-     * 
+     *
      * @param record $comment
      * @param array $authors the already retrieved authors for posts and comments
      * @param object $coursecontext
@@ -206,7 +205,7 @@ class format_socialwall_renderer extends format_topics_renderer {
 
     /**
      * Renders all the comments for a post
-     * 
+     *
      * @param object $post
      * @param array $authors the already retrieved authors for posts and comments
      * @param course_context $context
@@ -229,7 +228,7 @@ class format_socialwall_renderer extends format_topics_renderer {
 
     /**
      * Render a form in the timeline
-     * 
+     *
      * @param int $courseid
      * @param string $fields HTML for the formelements.
      * @param array $params params for the form tag.
@@ -250,7 +249,7 @@ class format_socialwall_renderer extends format_topics_renderer {
 
     /**
      * Render grades, if timeline post contains gradable modules
-     * 
+     *
      * @param array $authors the already retrieved authors for posts and comments
      * @param record $gradedata
      * @return string HTML for grading information
@@ -276,7 +275,7 @@ class format_socialwall_renderer extends format_topics_renderer {
 
     /**
      * Render the form to write a timeline comment or a reply to a comment
-     * 
+     *
      * @param string $actionlink the HTML output, where this HTML will be added
      * @param course_context $coursecontext
      * @param object $post
@@ -299,10 +298,13 @@ class format_socialwall_renderer extends format_topics_renderer {
 
             $style = (empty($post->locked)) ? '' : 'display:none';
 
-            $urlparams = array('courseid' => $post->courseid, 'postid' => $post->id, 'commentsformshow' => $post->id . '_' . $replycommentid);
+            $urlparams = array('courseid' => $post->courseid, 'postid' => $post->id,
+                    'commentsformshow' => $post->id . '_' . $replycommentid);
             $url = new moodle_url('/course/view.php', $urlparams);
-            $urltext = (empty($replycommentid)) ? get_string('writecomment', 'format_socialwall') : get_string('replycomment', 'format_socialwall');
-            $actionlink .= html_writer::link($url, $urltext, array('id' => "showcommentform_{$post->id}_{$replycommentid}", 'style' => $style));
+            $urltext = (empty($replycommentid)) ? get_string('writecomment', 'format_socialwall')
+                                                : get_string('replycomment', 'format_socialwall');
+            $actionlink .= html_writer::link($url, $urltext, array('id' => "showcommentform_{$post->id}_{$replycommentid}",
+                'style' => $style));
 
             $actionarea .= html_writer::tag('div', $actionlink, array('class' => 'tl-actionlink'));
         }
@@ -311,13 +313,15 @@ class format_socialwall_renderer extends format_topics_renderer {
 
             $formparams = array('postid' => $post->id, 'courseid' => $post->courseid, 'replycommentid' => $replycommentid);
             $url = new moodle_url('/course/format/socialwall/action.php', $formparams);
-            $commentform = new comment_form($url, $formparams, 'post', '', array('id' => 'tlcommentform_' . $post->id . '_' . $replycommentid));
+            $commentform = new comment_form($url, $formparams, 'post', '',
+                array('id' => 'tlcommentform_' . $post->id . '_' . $replycommentid));
 
             if (!$commentform->has_errors() and $this->commentsformshow != $post->id . '_' . $replycommentid) {
                 $style = 'display:none';
             }
 
-            $params = array('class' => 'tl-commentform', 'id' => "tlcommentformwrap_{$post->id}_{$replycommentid}", 'style' => $style);
+            $params = array('class' => 'tl-commentform', 'id' => "tlcommentformwrap_{$post->id}_{$replycommentid}",
+                'style' => $style);
 
             $actionarea .= html_writer::tag('div', $commentform->render(), $params);
         }
@@ -327,7 +331,7 @@ class format_socialwall_renderer extends format_topics_renderer {
 
     /**
      * Renders a timeline post.
-     * 
+     *
      * @param object $course
      * @param object $post
      * @param object $completion
@@ -361,7 +365,8 @@ class format_socialwall_renderer extends format_topics_renderer {
         $headline = get_string('postedonto', 'format_socialwall', array('author' => $authorspan, 'date' => $date, 'to' => $to));
 
         // ... add delete icon, if delete is possible.
-        $candeletepost = (($post->fromuserid == $USER->id) and ( has_capability('format/socialwall:deleteownpost', $coursecontext)));
+        $candeletepost = ($post->fromuserid == $USER->id
+                          && has_capability('format/socialwall:deleteownpost', $coursecontext));
         $candeletepost = ($candeletepost or has_capability('format/socialwall:deleteanypost', $coursecontext));
 
         if ($candeletepost) {
@@ -385,7 +390,6 @@ class format_socialwall_renderer extends format_topics_renderer {
             $headline .= html_writer::tag('span', $editlink, array('class' => 'tl-action-icons'));
         }
 
-        // ...
         if (!empty($post->posttext)) {
             // ...user with cap format/socialwall:posthtml should be able to html.
             $headline .= html_writer::tag('div', format_text($post->posttext), array('class' => 'tl-posttext'));
@@ -426,10 +430,12 @@ class format_socialwall_renderer extends format_topics_renderer {
 
             if (!empty($post->locked)) {
 
-                $pixicon = $this->output->pix_icon('lockedpost', get_string('unlockpost', 'format_socialwall'), 'format_socialwall');
+                $pixicon = $this->output->pix_icon('lockedpost', get_string('unlockpost', 'format_socialwall'),
+                    'format_socialwall');
             } else {
 
-                $pixicon = $this->output->pix_icon('unlockedpost', get_string('lockpost', 'format_socialwall'), 'format_socialwall');
+                $pixicon = $this->output->pix_icon('unlockedpost', get_string('lockpost', 'format_socialwall'),
+                    'format_socialwall');
             }
 
             $link = html_writer::link($url, $pixicon, array('id' => 'lockpost_' . $post->id, 'class' => $class));
@@ -447,10 +453,12 @@ class format_socialwall_renderer extends format_topics_renderer {
 
             if (!empty($post->sticky)) {
 
-                $pixicon = $this->output->pix_icon('stickypost', get_string('makeunsticky', 'format_socialwall'), 'format_socialwall');
+                $pixicon = $this->output->pix_icon('stickypost', get_string('makeunsticky', 'format_socialwall'),
+                    'format_socialwall');
             } else {
 
-                $pixicon = $this->output->pix_icon('unstickypost', get_string('makesticky', 'format_socialwall'), 'format_socialwall');
+                $pixicon = $this->output->pix_icon('unstickypost', get_string('makesticky', 'format_socialwall'),
+                    'format_socialwall');
             }
 
             $link = html_writer::link($url, $pixicon);
@@ -460,7 +468,8 @@ class format_socialwall_renderer extends format_topics_renderer {
             // ...cannot edit stickyness of post.
             if (!empty($post->sticky)) {
 
-                $pixicon = $this->output->pix_icon('stickypost', get_string('sticky', 'format_socialwall'), 'format_socialwall');
+                $pixicon = $this->output->pix_icon('stickypost', get_string('sticky', 'format_socialwall'),
+                    'format_socialwall');
                 $p .= html_writer::tag('div', $pixicon, array('class' => 'tl-sticky'));
             }
         }
@@ -532,7 +541,7 @@ class format_socialwall_renderer extends format_topics_renderer {
 
     /**
      * Renders a form for filtering and ording the timeline posts
-     * 
+     *
      * @param object $course
      * @param object $filteroptions
      * @return string HTML for the form.
@@ -553,7 +562,8 @@ class format_socialwall_renderer extends format_topics_renderer {
         if (!empty($filteroptions->postid)) {
 
             $content = html_writer::tag('h4', get_string('updatepostfiltered', 'format_socialwall'));
-            $url = new moodle_url('/course/format/socialwall/action.php', array('courseid' => $course->id, 'action' => 'resetfilter'));
+            $url = new moodle_url('/course/format/socialwall/action.php', array('courseid' => $course->id,
+                'action' => 'resetfilter'));
 
             $content .= $this->output->single_button($url, get_string('showallposts', 'format_socialwall'));
 
@@ -563,7 +573,8 @@ class format_socialwall_renderer extends format_topics_renderer {
         // Filter by group.
         $coursecontext = context_course::instance($course->id);
 
-        if ((groups_get_course_groupmode($course) == SEPARATEGROUPS) && (!has_capability('moodle/course:managegroups', $coursecontext))) {
+        if (groups_get_course_groupmode($course) == SEPARATEGROUPS
+            && !has_capability('moodle/course:managegroups', $coursecontext)) {
 
             $allgroups = groups_get_all_groups($course->id, $USER->id);
             $alllabel = get_string('allmygroups', 'format_socialwall');
@@ -607,7 +618,7 @@ class format_socialwall_renderer extends format_topics_renderer {
 
     /**
      * Print out the first section (i. e. section number 0) for the course
-     * 
+     *
      * @param object $course
      * @param section_info $sectioninfo
      */
@@ -627,7 +638,7 @@ class format_socialwall_renderer extends format_topics_renderer {
 
     /**
      * Print the section which contains the post form (i. e. section number 2)
-     * 
+     *
      * @global object $this->output
      * @param object $course
      * @param object $sectioninfo
@@ -683,7 +694,7 @@ class format_socialwall_renderer extends format_topics_renderer {
                 $o .= html_writer::end_div();
             }
 
-            // Render the recent attaches section, when user is editing or updating;
+            // Render the recent attaches section, when user is editing or updating.
             if ($USER->editing or $postid > 0) {
 
                 $content = '';
@@ -718,7 +729,8 @@ class format_socialwall_renderer extends format_topics_renderer {
         }
 
         if ($USER->editing) {
-            $o .= html_writer::tag('div', $this->render_postform_recent_activities_form($course, $postid), array('style' => 'display:none'));
+            $o .= html_writer::tag('div', $this->render_postform_recent_activities_form($course, $postid),
+                array('style' => 'display:none'));
         }
         echo $o;
     }
@@ -727,7 +739,7 @@ class format_socialwall_renderer extends format_topics_renderer {
      * Render the form for attaching recent (existing) activities to the post form.
      * This is only generated when course is in edit mode and the form is initially hidden.
      * The HTML is used in the content of the add activity dialog.
-     * 
+     *
      * @param object $course
      * @return string HTML for the add (recent) activity form
      */
@@ -736,7 +748,8 @@ class format_socialwall_renderer extends format_topics_renderer {
 
         require_once($CFG->dirroot . '/course/format/socialwall/pages/addactivity_form.php');
 
-        $form = new addactivity_form('', array('courseid' => $course->id, 'postid' => $postid), 'post', '', array('id' => 'tl-addrecentactivity-form'));
+        $form = new addactivity_form('', array('courseid' => $course->id, 'postid' => $postid), 'post',
+            '', array('id' => 'tl-addrecentactivity-form'));
         $o = html_writer::tag('div', $form->render(), array('id' => 'tl-addrecentactivity-formwrapper'));
 
         return $o;
@@ -744,7 +757,7 @@ class format_socialwall_renderer extends format_topics_renderer {
 
     /**
      * Render the list of recent (i. e. activities, which are already created) attached activities.
-     * 
+     *
      * @param object $course
      * @return string HTML with the list of attached activities
      */
@@ -776,7 +789,7 @@ class format_socialwall_renderer extends format_topics_renderer {
 
     /**
      * Print out the timeline section (i. e. section number 1)
-     * 
+     *
      * @param object $course
      * @param object $postsdata all the gathered data to print posts
      * @param object $completion completion info of course
@@ -807,7 +820,7 @@ class format_socialwall_renderer extends format_topics_renderer {
 
     /**
      * Print out the course page
-     * 
+     *
      * @param object $course
      * @param completion_info $completioninfo
      */
@@ -855,7 +868,8 @@ class format_socialwall_renderer extends format_topics_renderer {
         );
 
         $this->page->requires->strings_for_js(
-                array('counttotalpost', 'like', 'likenomore', 'countlikes', 'countcomments', 'textrequired', 'confirmdeletecomment'), 'format_socialwall');
+                array('counttotalpost', 'like', 'likenomore', 'countlikes', 'countcomments', 'textrequired',
+                    'confirmdeletecomment'), 'format_socialwall');
 
         $this->page->requires->yui_module(
                 'moodle-format_socialwall-postform', 'M.format_socialwall.postforminit', array($args), null, true);
@@ -863,7 +877,7 @@ class format_socialwall_renderer extends format_topics_renderer {
 
     /**
      * Render the posts loaded by an AJAX call
-     * 
+     *
      * @param object $course
      * @param object $postsdata data of post for rendering
      * @return string HTML for post
@@ -880,7 +894,7 @@ class format_socialwall_renderer extends format_topics_renderer {
 
     /**
      * Render the comment loaded by an AJAX call
-     * 
+     *
      * @param context_course $context
      * @param object $comment
      * @param object $author
@@ -895,8 +909,8 @@ class format_socialwall_renderer extends format_topics_renderer {
     }
 
     /**
-     * Render the comments loaded by an AJAX call 
-     * 
+     * Render the comments loaded by an AJAX call
+     *
      * @param int $postid id of post
      * @param context_course $context
      * @param object $commentsdata data render comments
@@ -915,8 +929,8 @@ class format_socialwall_renderer extends format_topics_renderer {
     }
 
     /**
-     * Render the replies loaded by an AJAX call 
-     * 
+     * Render the replies loaded by an AJAX call
+     *
      * @param object $post
      * @param context_course $context
      * @param object $commentsdata data render comments

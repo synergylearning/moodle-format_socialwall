@@ -26,8 +26,8 @@ defined('MOODLE_INTERNAL') || die();
 define('FORMAT_SOCIALWALL_TIMELINESECTION', 1);
 define('FORMAT_SOCIALWALL_POSTFORMSECTION', 2);
 
-/** Eventhandling for the mod_created event, activate the 
- *  acl control by setting moduls availabilty field, 
+/** Eventhandling for the mod_created event, activate the
+ *  acl control by setting moduls availabilty field,
  *  even if user has edit (i. e. deleted), when acl is on.
  */
 function format_socialwall_course_module_deleted($event) {

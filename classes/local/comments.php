@@ -26,7 +26,7 @@ namespace format_socialwall\local;
 /** class for timeline comments */
 class comments {
 
-    /** 
+    /**
      * Create instance as a singleton
      */
     public static function instance() {
@@ -40,9 +40,9 @@ class comments {
         return $comments;
     }
 
-    /** 
+    /**
      * Add all comments and add more authors to postsdata record
-     * 
+     *
      * @param object $postsdata
      * @return boolean, true, if succeded
      */
@@ -59,7 +59,11 @@ class comments {
 
         list($inpostid, $inpostparams) = $DB->get_in_or_equal(array_keys($posts));
 
-        $sql = "SELECT * FROM {format_socialwall_comments} WHERE postid {$inpostid} AND replycommentid = '0' ORDER BY timecreated DESC";
+        $sql = "SELECT *
+                  FROM {format_socialwall_comments}
+                 WHERE postid {$inpostid}
+                   AND replycommentid = '0'
+              ORDER BY timecreated DESC";
 
         if (!$comments = $DB->get_records_sql($sql, $inpostparams)) {
             return false;
@@ -87,7 +91,8 @@ class comments {
         }
 
         // Add replies to comments.
-        if (!$replies = $DB->get_records_list('format_socialwall_comments', 'replycommentid', array_keys($parentcommentids), 'timecreated DESC')) {
+        if (!$replies = $DB->get_records_list('format_socialwall_comments', 'replycommentid', array_keys($parentcommentids),
+            'timecreated DESC')) {
             return true;
         }
 
@@ -100,7 +105,8 @@ class comments {
                 $postsdata->posts[$comment->postid]->comments[$comment->id]->replies = array();
             }
 
-            if (!empty($limitreplies) and ( count($postsdata->posts[$comment->postid]->comments[$comment->id]->replies) == $limitreplies)) {
+            if (!empty($limitreplies)
+                && (count($postsdata->posts[$comment->postid]->comments[$comment->id]->replies) == $limitreplies)) {
                 continue;
             }
 
@@ -113,7 +119,7 @@ class comments {
 
     /**
      * Get all the data for displaying all replies of one comment
-     * 
+     *
      * @return \stdClass object containing autors and comment of a post.
      */
     public function get_replies_data($comment) {
@@ -123,7 +129,8 @@ class comments {
         $repliesdata->comment = $comment;
 
         // Add replies to comment.
-        if (!$replies = $DB->get_records('format_socialwall_comments', array('replycommentid' => $comment->id), 'timecreated DESC')) {
+        if (!$replies = $DB->get_records('format_socialwall_comments', array('replycommentid' => $comment->id),
+            'timecreated DESC')) {
             return $repliesdata;
         }
 
@@ -145,7 +152,7 @@ class comments {
 
     /**
      * Get all the data for displaying comments of a post
-     * 
+     *
      * @param int $postid
      * @return \stdClass object containing autors and comment of a post.
      */
@@ -182,7 +189,7 @@ class comments {
 
     /**
      * Refresh the count of replies for a comment.
-     *  
+     *
      * @param int $commentid
      * @return boolean|object false if no refresh, updated comment data
      */
@@ -200,9 +207,9 @@ class comments {
         return false;
     }
 
-    /** 
+    /**
      * Save a new comment from submit
-     * 
+     *
      * @param object $comment submitted data from form.
      * @return array result array to use for ajax and non ajax request.
      */
@@ -259,9 +266,9 @@ class comments {
         return $result;
     }
 
-    /** 
+    /**
      * Delete comment and refresh the number of comments in post table
-     * 
+     *
      * @param int $cid, id of comment.
      * @return array result
      */
@@ -276,7 +283,8 @@ class comments {
         // ...check capability.
         $coursecontext = \context_course::instance($comment->courseid);
 
-        $candeletecomment = (($comment->fromuserid == $USER->id) and ( has_capability('format/socialwall:deleteowncomment', $coursecontext)));
+        $candeletecomment = ($comment->fromuserid == $USER->id
+                            && has_capability('format/socialwall:deleteowncomment', $coursecontext));
         $candeletecomment = ($candeletecomment or has_capability('format/socialwall:deleteanycomment', $coursecontext));
 
         if (!$candeletecomment) {

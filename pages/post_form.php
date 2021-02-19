@@ -73,7 +73,8 @@ class post_form extends moodleform {
         if ($action == 'updatepost') {
             $buttongroup[] = $mform->createElement('cancel');
         }
-        $mform->addGroup($buttongroup);
+        $group = $mform->addGroup($buttongroup);
+        $group->setAttributes(array('class' => 'fgroup_id_group_1'));
 
         // ... htmleditor/texarea to post text.
         $canposthtml = has_capability('format/socialwall:posthtml', $context);
@@ -148,7 +149,9 @@ class post_form extends moodleform {
         }
 
         if (count($postoptions) > 0) {
-            $mform->addGroup($postoptions);
+            $group = $mform->addGroup($postoptions);
+            $group->setAttributes(array('class' => 'fgroup_id_group_2'));
+
         }
 
         // ... display the activites prepared for the next post only by a teacher.
@@ -172,7 +175,7 @@ class post_form extends moodleform {
 
             if ($canpostfile) {
 
-                $uploadfileicon = html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url('icon', 'resource')));
+                $uploadfileicon = $OUTPUT->pix_icon('icon', get_string('uploadafile', 'format_socialwall'), 'resource');
                 $linktext = $uploadfileicon . get_string('uploadafile', 'format_socialwall');
 
                 $url = new moodle_url('/course/view.php', array('id' => $courseid, 'loadfilemanager' => 1));
@@ -184,13 +187,14 @@ class post_form extends moodleform {
             $canposturl = (has_capability('format/socialwall:posturl', $context) && (!empty($course->enablestudentupload)));
 
             if ($canposturl) {
-                $addlinkicon = html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url('icon', 'url')));
+                $addlinkicon = $OUTPUT->pix_icon('icon', get_string('addalink', 'format_socialwall'), 'url');
                 $at = html_writer::link('#', $addlinkicon . get_string('addalink', 'format_socialwall'), array('id' => 'addalink'));
                 $attachgroup[] = $mform->createElement('static', 'addalink', '', $at);
             }
 
             if (!empty($attachgroup)) {
-                $mform->addGroup($attachgroup);
+                $group = $mform->addGroup($attachgroup);
+                $group->setAttributes(array('class' => 'fgroup_id_group_3'));
             }
 
             $loadfilemanager = optional_param('loadfilemanager', 0, PARAM_INT);
@@ -218,7 +222,8 @@ class post_form extends moodleform {
 
             $mform->addElement('html', html_writer::start_div('', array('id' => 'externalurlwrapper', 'style' => $style)));
 
-            $mform->addElement('url', 'externalurl', get_string('externalurl', 'url'), array('size' => '60'), array('usefilepicker' => true));
+            $mform->addElement('url', 'externalurl', get_string('externalurl', 'url'),
+                array('size' => '60'), array('usefilepicker' => true));
 
             $mform->setType('externalurl', PARAM_URL);
             if (isset($errors['externalurl'])) {

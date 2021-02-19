@@ -125,7 +125,7 @@ class addactivity_form extends moodleform {
 
     /**
      * Compare the modules by name
-     * 
+     *
      * @param object $mod1
      * @param object $mod2
      * @return int
