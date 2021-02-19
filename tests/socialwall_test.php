@@ -123,7 +123,7 @@ class format_socialwall_testcase extends advanced_testcase {
         // Try with different setting.
         $generator->enrol_user($user1->id, $course1->id, 5);
 
-        // Set deleteaferunenrol.
+        // Set deleteafterunenrol.
         $DB->set_field('course_format_options', 'value', 1, array('format' => 'socialwall', 'name' => 'deleteafterunenrol'));
 
         format_socialwall::reset_course_cache();
@@ -145,7 +145,7 @@ class format_socialwall_testcase extends advanced_testcase {
         $this->assertEquals(0, $count);
 
         $count = $DB->count_records('label', array('id' => $label1->id));
-        $this->assertEquals(0, $count);
+        $this->assertEquals(1, $count);
 
         $count = $DB->count_records('format_socialwall_posts', array('fromuserid' => $user1->id, 'courseid' => $course2->id));
         $this->assertEquals(1, $count);
